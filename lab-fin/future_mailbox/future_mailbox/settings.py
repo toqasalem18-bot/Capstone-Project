@@ -126,9 +126,12 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-LOGIN_REDIRECT_URL = '/'
+
 # بعد logout، رجوع للصفحة الرئيسية
 # بعد تسجيل الخروج، رجوع لصفحة تسجيل الدخول
-LOGOUT_REDIRECT_URL = '/'  # أو رابط login
+LOGIN_REDIRECT_URL = '/timeline/'  # بعد تسجيل الدخول أو التسجيل
+LOGOUT_REDIRECT_URL = '/login/'    # بعد تسجيل الخروج
+
+
 
 

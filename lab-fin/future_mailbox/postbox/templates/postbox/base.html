@@ -21,13 +21,16 @@
             justify-content: space-between;
             align-items: center;
         }
-        nav a {
+        nav a, nav form button {
             color: white;
             text-decoration: none;
             margin-left: 20px;
             font-weight: 600;
+            background: none;
+            border: none;
+            cursor: pointer;
         }
-        nav a:hover {
+        nav a:hover, nav form button:hover {
             text-decoration: underline;
         }
         .container {
@@ -54,17 +57,16 @@
 
         {% if user.is_authenticated %}
             <a href="{% url 'postbox:event_create' %}">Add Event</a>
-            <a href="#">My Events</a>
-
-            <!-- Logout form -->
-            <form action="{% url 'logout' %}" method="post" style="display:inline;">
+            <a href="{% url 'postbox:my_events' %}">My Events</a>
+            
+            <form action="{% url 'postbox:logout' %}" method="post" style="display:inline;">
                 {% csrf_token %}
                 <button type="submit" style="background:none; border:none; color:white; font-weight:600; cursor:pointer;">
                     Logout
                 </button>
             </form>
         {% else %}
-            <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'postbox:login' %}">Login</a>
             <a href="{% url 'postbox:signup' %}">Register</a>
         {% endif %}
     </nav>
@@ -72,8 +74,7 @@
 
 
     <div class="container">
-        {% block content %}
-        {% endblock %}
+        {% block content %}{% endblock %}
     </div>
 
     <footer>

@@ -23,14 +23,14 @@ class EventListView(LoginRequiredMixin, ListView):
 # ==========================
 # تفاصيل الحدث + التعليقات
 # ==========================
-class EventDetailView(LoginRequiredMixin, DetailView):
+class EventDetailView(DetailView):
     model = Event
     template_name = 'postbox/event_detail.html'
     context_object_name = 'event'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['comment_form'] = CommentForm()
+        context['form'] = CommentForm()
         context['comments'] = self.object.comments.all().order_by('-created_at')
         return context
 
@@ -43,9 +43,8 @@ class EventDetailView(LoginRequiredMixin, DetailView):
             comment.event = self.object
             comment.save()
             return redirect('postbox:event_detail', pk=self.object.pk)
-        context = self.get_context_data(comment_form=form)
+        context = self.get_context_data(form=form)
         return self.render_to_response(context)
-
 # ==========================
 # إنشاء حدث جديد
 # ==========================
@@ -99,3 +98,66 @@ def signup_view(request):
 def my_events(request):
     events = Event.objects.filter(user=request.user).order_by('-event_date')
     return render(request, 'postbox/my_events.html', {'events': events})
+
+from django.views.generic import DeleteView
+
+class EventDeleteView(LoginRequiredMixin, DeleteView):
+    model = Event
+    template_name = 'postbox/event_confirm_delete.html'
+    success_url = reverse_lazy('postbox:timeline')
+
+    def get_queryset(self):
+        # السماح للمستخدم بحذف أحداثه فقط
+        return Event.objects.filter(user=self.request.user)
+    
+def my_events(request):
+    events = Event.objects.filter(user=request.user).order_by('-event_date')
+    return render(request, 'postbox/my_events.html', {'events': events})
+
+@login_required
+def add_comment(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.user = request.user
+            comment.event = event
+            comment.save()
+            return redirect('postbox:event_detail', pk=event.id)
+    else:
+        form = CommentForm()
+
+    return render(request, 'postbox/add_comment.html', {'form': form, 'event': event})
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Event, Comment
+from .forms import CommentForm  # افترض أن لديك CommentForm معرف في forms.py
+
+def event_detail(request, pk):
+    event = get_object_or_404(Event, pk=pk)
+    comments = Comment.objects.filter(event=event).order_by('-created_at')
+
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            comment_form = CommentForm(request.POST)
+            if comment_form.is_valid():
+                new_comment = comment_form.save(commit=False)
+                new_comment.event = event
+                new_comment.user = request.user
+                new_comment.save()
+                return redirect('postbox:event_detail', pk=event.pk)
+        else:
+            return redirect('postbox:login')
+    else:
+        comment_form = CommentForm()
+
+    context = {
+        'event': event,
+        'comments': comments,
+        'comment_form': comment_form
+    }
+    return render(request, 'postbox/event_detail.html', context)

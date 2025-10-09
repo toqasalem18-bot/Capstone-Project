@@ -1,0 +1,10 @@
+<h2>My Events</h2>
+<ul>
+  {% for event in events %}
+    <li>
+      {{ event.event_date }} — <a href="{% url 'postbox:event_detail' event.pk %}">{{ event.title }}</a>
+    </li>
+  {% empty %}
+    <li>You haven't added any events yet.</li>
+  {% endfor %}
+</ul>
