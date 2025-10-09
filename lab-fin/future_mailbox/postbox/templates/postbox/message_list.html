@@ -1,0 +1,73 @@
+{% extends 'postbox/base.html' %}
+
+{% block content %}
+<div class="inbox-container">
+  <h2>📥 Your Inbox</h2>
+
+  {% if messages %}
+    <ul>
+      {% for message in messages %}
+        <li>
+          <strong>{{ message.subject }}</strong> - {{ message.sender.username }} 
+          <p>{{ message.body|truncatewords:15 }}</p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No messages yet! 🎉</p>
+  {% endif %}
+
+  <a href="{% url 'postbox:message_create' %}">Compose New Message</a>
+
+</div>
+
+<style>
+.inbox-container {
+  background: rgba(255,255,255,0.05);
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  max-width: 700px;
+  margin: 50px auto;
+  color: #fff;
+  animation: floatInbox 3s ease-in-out infinite;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  background: rgba(0,0,0,0.2);
+  margin: 15px 0;
+  padding: 15px 20px;
+  border-radius: 15px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+li:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(143,148,251,0.4);
+}
+
+.compose-link {
+  display: inline-block;
+  margin-top: 20px;
+  color: #ff7eb3;
+  text-decoration: none;
+  font-weight: bold;
+  transition: transform 0.2s;
+}
+
+.compose-link:hover {
+  transform: translateY(-3px);
+}
+
+@keyframes floatInbox {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+</style>
+{% endblock %}

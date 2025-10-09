@@ -1,0 +1,86 @@
+{% extends 'postbox/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- أيقونة مرحة تطفو -->
+<img src="https://cdn-icons-png.flaticon.com/512/561/561127.png" class="floating-icon" alt="mailbox" />
+
+<h1>Welcome, {{ user.username }}! 👋</h1>
+<p>Here’s your inbox. Check out your messages:</p>
+
+<ul class="message-list">
+  {% for message in messages %}
+    <li class="message-item">
+      <strong>{{ message.sender.username }}</strong>: {{ message.subject|truncatechars:40 }}
+      <small style="display:block; color:#ddd;">{{ message.send_at|date:"Y-m-d H:i" }}</small>
+    </li>
+  {% empty %}
+    <li class="message-item">No messages yet 😅</li>
+  {% endfor %}
+</ul>
+
+<a href="{% url 'postbox:message_create' %}">
+  <button class="compose-btn">Compose Message</button>
+</a>
+
+<form method="post" action="{% url 'logout' %}">
+  {% csrf_token %}
+  <button type="submit" class="logout-btn">Logout</button>
+</form>
+
+<style>
+.floating-icon {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70px;
+  animation: bounce 3s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%,100% { transform: translate(-50%,0) rotate(0deg); }
+  25% { transform: translate(-50%,-12px) rotate(-10deg); }
+  50% { transform: translate(-50%,-18px) rotate(10deg); }
+  75% { transform: translate(-50%,-12px) rotate(-5deg); }
+}
+
+.message-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 25px;
+}
+
+.message-item {
+  background: rgba(255,255,255,0.2);
+  margin-bottom: 12px;
+  padding: 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.message-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(255,255,255,0.3);
+}
+
+.compose-btn, .logout-btn {
+  margin-top: 15px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  background: linear-gradient(90deg, #4e54c8, #8f94fb);
+  color: #fff;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.compose-btn:hover, .logout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(78,84,200,0.5);
+}
+</style>
+{% endblock %}
