@@ -49,11 +49,13 @@ class EventDetailView(LoginRequiredMixin, DetailView):
 # ==========================
 # إنشاء حدث جديد
 # ==========================
+from django.urls import reverse_lazy
+
 class EventCreateView(LoginRequiredMixin, CreateView):
     model = Event
     form_class = EventForm
     template_name = 'postbox/event_create.html'
-    success_url = reverse_lazy('postbox:timeline')
+    success_url = reverse_lazy('postbox:timeline')  # هنا بدل 'dashboard'
 
     def form_valid(self, form):
         event = form.save(commit=False)
@@ -61,46 +63,39 @@ class EventCreateView(LoginRequiredMixin, CreateView):
         event.save()
         return super().form_valid(form)
 
-# ==========================
-# تعديل حدث
-# ==========================
+
 class EventUpdateView(LoginRequiredMixin, UpdateView):
     model = Event
     form_class = EventForm
     template_name = 'postbox/evente_form.html'
-    success_url = reverse_lazy('postbox:timeline')
+    success_url = reverse_lazy('postbox:timeline')  # هنا بدل 'dashboard'
 
     def get_queryset(self):
-        # المستخدم يمكنه تعديل أحداثه فقط
         return Event.objects.filter(user=self.request.user)
-
 
 # ==========================
 #  صفحة التسجيل (Sign up)
 # ==========================
 def signup_view(request):
     if request.user.is_authenticated:
-        return redirect('postbox:dashboard')
+        return redirect('postbox:timeline')  # إذا مسجل دخول مسبقًا
+
+    form = UserCreationForm(request.POST or None)
 
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        username = request.POST.get('username')
-        if User.objects.filter(username=username).exists():
-            messages.error(request, "   the user alaready here  😅")
-        elif form.is_valid():
+        if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('postbox:dashboard')
-    else:
-        form = UserCreationForm()
+            return redirect('postbox:timeline')  # بعد التسجيل، أرسل للتايم لاين
+        else:
+            messages.error(request, "Please correct the errors below.")
 
     return render(request, 'postbox/signup.html', {'form': form})
 
 # ==========================
-#  لوحة التحكم (Dashboard)
+# صفحة "My Events" لكل مستخدم
 # ==========================
 @login_required(login_url='/accounts/login/')
-def dashboard(request):
-    # جلب جميع الرسائل للمستخدم الحالي
-    messages_list = Message.objects.filter(recipient=request.user).order_by('-send_at')
-    return render(request, 'postbox/dashboard.html', {'messages': messages_list})
+def my_events(request):
+    events = Event.objects.filter(user=request.user).order_by('-event_date')
+    return render(request, 'postbox/my_events.html', {'events': events})
