@@ -73,51 +73,40 @@ python manage.py runserver
 
 
 
-🧩 User Stories / Features
+## 🧩 User Stories / Features
 
-Users can register, log in, and log out.
+- **User Authentication:** Users can register, log in, and log out.  
+- **Event Management:** Users can create, edit, and delete their own life events.  
+- **Timeline:** Users can view all users’ events in a shared timeline sorted by date.  
+- **Commenting:** Users can comment on any event.  
+- **Admin Controls:** Admins can remove inappropriate comments or manage users.  
+- **My Events:** Each user has a “My Events” page showing their events.
 
-Users can create, edit, and delete their own life events.
+---
 
-Users can view all users’ events in a shared timeline sorted by date.
+## 🌟 Stretch Goals (Optional)
 
-Users can comment on any event.
+- Write and run unit tests (TDD optional)  
+- Add image or file uploads for events  
+- Implement advanced queries, filters, or pagination  
+- Customize user profiles (profile picture, bio, etc.)  
+- Email notifications when someone comments on an event  
+- Infinite scroll or pagination on the timeline feed
 
-Admins can remove inappropriate comments or manage users.
+---
 
-Each user has a “My Events” page showing their events.
+## 🔗 External Resources
 
+- [Django Documentation](https://docs.djangoproject.com/)  
+- Stack Overflow (for troubleshooting login/logout and form issues)  
+- W3Schools HTML/CSS guides  
+- MDN Web Docs (for form validation, CSS styling, JS references)
 
-🌟 Stretch Goals (Optional)
+---
 
-Write and run unit tests (TDD optional)
+## 🛠️ Issues and Project Workflow
 
-Add image or file uploads for events
-
-Implement advanced queries, filters, or pagination
-
-Customize user profiles (profile picture, bio, etc.)
-
-Email notifications when someone comments on an event
-
-Infinite scroll or pagination on timeline feed
-
-🔗 External Resources
-
-Django Documentation: https://docs.djangoproject.com/
-
-Stack Overflow (for troubleshooting login/logout and form issues)
-
-W3Schools HTML/CSS guides
-
-MDN Web Docs (for form validation, CSS styling, JS references)
-
-🛠️ Issues and Project Workflow
-
-Keep issues active until resolved.
-
-Document the solution in the issue thread before closing.
-
-Inactive issues for 30+ minutes may be closed automatically.
-
-Closed issues cannot be reopened; create a new issue if needed (link to previous).
+- Keep issues active until resolved.  
+- Document the solution in the issue thread before closing.  
+- Inactive issues for 30+ minutes may be closed automatically.  
+- Closed issues cannot be reopened; create a new issue if needed (link to previous).
