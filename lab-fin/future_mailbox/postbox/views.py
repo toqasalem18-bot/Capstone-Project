@@ -11,9 +11,7 @@ from django.contrib.auth.models import User
 from .models import Message
 from .forms import MessageForm
 
-# ==========================
-#  قائمة الرسائل
-# ==========================
+
 class MessageListView(LoginRequiredMixin, ListView):
     model = Message
     template_name = 'postbox/message_list.html'
@@ -37,13 +35,13 @@ class MessageCreateView(LoginRequiredMixin, CreateView):
     model = Message
     form_class = MessageForm
     template_name = 'postbox/message_form.html'
-    success_url = reverse_lazy('postbox:dashboard')  # العودة للداش بورد بعد الحفظ
+    success_url = reverse_lazy('postbox:dashboard')  
 
     def form_valid(self, form):
         obj = form.save(commit=False)
         obj.sender = self.request.user
         if obj.send_at and obj.send_at <= timezone.now():
-            obj.is_sent = True  # تُرسل فوراً إذا الوقت الحالي أكبر أو يساوي
+            obj.is_sent = True  
         obj.save()
         return super().form_valid(form)
 
@@ -58,7 +56,7 @@ def signup_view(request):
         form = UserCreationForm(request.POST)
         username = request.POST.get('username')
         if User.objects.filter(username=username).exists():
-            messages.error(request, "اسم المستخدم هذا موجود بالفعل 😅")
+            messages.error(request, "   the user alaready here  😅")
         elif form.is_valid():
             user = form.save()
             login(request, user)
