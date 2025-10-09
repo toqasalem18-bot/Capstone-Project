@@ -1,12 +1,12 @@
 from django import forms
-from .models import Message
+from .models import Event, Comment
 
-class MessageForm(forms.ModelForm):
-    send_at = forms.DateTimeField(
-        required=False,
-        widget=forms.DateTimeInput(attrs={'type': 'datetime-local'})
-    )
-
+class EventForm(forms.ModelForm):
     class Meta:
-        model = Message
-        fields = ['subject', 'body', 'recipient', 'send_at']  
+        model = Event
+        fields = ['title', 'description', 'event_date']
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']

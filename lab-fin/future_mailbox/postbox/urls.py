@@ -4,9 +4,15 @@ from . import views
 app_name = 'postbox'
 
 urlpatterns = [
-    path('', views.dashboard, name='dashboard'),
-    path('messages/', views.MessageListView.as_view(), name='message_list'),   
-    path('signup/', views.signup_view, name='signup'),                
-    path('messages/<int:pk>/', views.MessageDetailView.as_view(), name='message_detail'),  # تفاصيل الرسالة
-    path('messages/create/', views.MessageCreateView.as_view(), name='message_create'),   # إنشاء رسالة جديدة
+    # Dashboard والـ CRUD القديم (Message)
+    path('dashboard/', views.dashboard, name='dashboard'),
+
+    # الأحداث الجديدة (Events)
+    path('events/', views.EventListView.as_view(), name='timeline'),  # صفحة جميع الأحداث
+    path('events/<int:pk>/', views.EventDetailView.as_view(), name='event_detail'),
+    path('events/create/', views.EventCreateView.as_view(), name='event_create'),
+    path('events/<int:pk>/edit/', views.EventUpdateView.as_view(), name='event_edit'),
+
+    # التسجيل القديم
+    path('signup/', views.signup_view, name='signup'),
 ]

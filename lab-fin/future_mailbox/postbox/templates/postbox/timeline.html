@@ -1,0 +1,64 @@
+{% extends 'postbox/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="timeline-container">
+    <h2>All Events Timeline</h2>
+    {% if events %}
+        <ul class="events-list">
+            {% for event in events %}
+                <li>
+                    <a href="{% url 'postbox:event_detail' event.pk %}">
+                        <strong>{{ event.title }}</strong> — {{ event.event_date }} by {{ event.user.username }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No events yet. Be the first to create one!</p>
+    {% endif %}
+    <a href="{% url 'postbox:event_create' %}" class="btn-create-event">+ Add Event</a>
+</div>
+
+<style>
+.timeline-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px;
+    color: #fff;
+}
+
+.events-list {
+    list-style: none;
+    padding: 0;
+}
+
+.events-list li {
+    padding: 10px;
+    margin-bottom: 10px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+}
+
+.events-list li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.btn-create-event {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: linear-gradient(90deg, #4e54c8, #8f94fb);
+    color: #fff;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.btn-create-event:hover {
+    opacity: 0.9;
+}
+</style>
+{% endblock %}

@@ -1,86 +1,67 @@
 {% extends 'postbox/base.html' %}
-
-{% block title %}Dashboard{% endblock %}
+{% load static %}
 
 {% block content %}
+<div class="dashboard-container">
+    <h2>Welcome, {{ request.user.username }}!</h2>
+    
+    <div class="messages-section">
+        <h3>Your Messages</h3>
+        {% if messages %}
+            <ul class="messages-list">
+                {% for message in messages %}
+                    <li>
+                        <strong>{{ message.subject }}</strong> — To: {{ message.recipient.username }}<br>
+                        <small>Sent at: {{ message.send_at|date:"Y-m-d H:i" }}</small>
+                        <p>{{ message.body|linebreaks }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No messages yet.</p>
+        {% endif %}
+    </div>
 
-<img src="https://cdn-icons-png.flaticon.com/512/561/561127.png" class="floating-icon" alt="mailbox" />
-
-<h1>Welcome, {{ user.username }}! 👋</h1>
-<p>Here’s your inbox. Check out your messages:</p>
-
-<ul class="message-list">
-  {% for message in messages %}
-    <li class="message-item">
-      <strong>{{ message.sender.username }}</strong>: {{ message.subject|truncatechars:40 }}
-      <small style="display:block; color:#ddd;">{{ message.send_at|date:"Y-m-d H:i" }}</small>
-    </li>
-  {% empty %}
-    <li class="message-item">No messages yet 😅</li>
-  {% endfor %}
-</ul>
-
-<a href="{% url 'postbox:message_create' %}">
-  <button class="compose-btn">Compose Message</button>
-</a>
-
-<form method="post" action="{% url 'logout' %}">
-  {% csrf_token %}
-  <button type="submit" class="logout-btn">Logout</button>
-</form>
+    <a href="{% url 'postbox:timeline' %}" class="btn-view-events">View All Events</a>
+</div>
 
 <style>
-.floating-icon {
-  position: absolute;
-  top: -60px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 70px;
-  animation: bounce 3s ease-in-out infinite;
+.dashboard-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    color: #fff;
 }
 
-@keyframes bounce {
-  0%,100% { transform: translate(-50%,0) rotate(0deg); }
-  25% { transform: translate(-50%,-12px) rotate(-10deg); }
-  50% { transform: translate(-50%,-18px) rotate(10deg); }
-  75% { transform: translate(-50%,-12px) rotate(-5deg); }
+.messages-section {
+    margin-top: 20px;
 }
 
-.message-list {
-  list-style: none;
-  padding: 0;
-  margin-top: 25px;
+.messages-list {
+    list-style: none;
+    padding: 0;
 }
 
-.message-item {
-  background: rgba(255,255,255,0.2);
-  margin-bottom: 12px;
-  padding: 14px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+.messages-list li {
+    padding: 12px;
+    margin-bottom: 12px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
 }
 
-.message-item:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 16px rgba(255,255,255,0.3);
+.btn-view-events {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: linear-gradient(90deg, #4e54c8, #8f94fb);
+    color: #fff;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
 }
 
-.compose-btn, .logout-btn {
-  margin-top: 15px;
-  padding: 12px 20px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-  background: linear-gradient(90deg, #4e54c8, #8f94fb);
-  color: #fff;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.compose-btn:hover, .logout-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(78,84,200,0.5);
+.btn-view-events:hover {
+    opacity: 0.9;
 }
 </style>
 {% endblock %}
