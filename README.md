@@ -1,7 +1,5 @@
 # JoyLine – A Positive Event Timeline
-
----
-
+# README:
 ## 📖 Project Overview
 **JoyLine** is a social web app where users share important life events such as graduations, birthdays, anniversaries, or new jobs.  
 Each event becomes a hub of positivity, allowing the community to celebrate and encourage each other.  
