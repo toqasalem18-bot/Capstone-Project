@@ -48,30 +48,6 @@ Users can look back at their timeline to relive happy moments.
 
 ---
 
-## ⚙️ Installation Guide
-1. Clone the repo:  
-```bash
-git clone git@github.com:toqasalem18-bot/Capstone-Project.git
-cd Capstone-Project\lab-fin\future_mailbox
-
-2.Create a virtual environment :
-bash
-Copy code
-python -m venv venv
-
-3.Activate the virtual environment:
-.\venv\Scripts\activate
-
-4.Apply migrations:
-python manage.py migrate
-
-5.Create a superuser (for admin access):
-python manage.py createsuperuser
-
-6.python manage.py runserver:
-python manage.py runserver
-
-
 
 ## 🧩 User Stories / Features
 
@@ -110,3 +86,28 @@ python manage.py runserver
 - Document the solution in the issue thread before closing.  
 - Inactive issues for 30+ minutes may be closed automatically.  
 - Closed issues cannot be reopened; create a new issue if needed (link to previous).
+
+## ⚙️ Installation Guide
+1. Clone the repo:  
+```bash
+git clone git@github.com:toqasalem18-bot/Capstone-Project.git
+cd Capstone-Project\lab-fin\future_mailbox
+
+2.Create a virtual environment :
+bash
+Copy code
+python -m venv venv
+
+3.Activate the virtual environment:
+.\venv\Scripts\activate
+
+4.Apply migrations:
+python manage.py migrate
+
+5.Create a superuser (for admin access):
+python manage.py createsuperuser
+
+6.python manage.py runserver:
+python manage.py runserver
+
+
