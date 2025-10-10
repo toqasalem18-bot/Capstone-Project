@@ -1,15 +1,126 @@
 {% extends 'postbox/base.html' %}
-
 {% block content %}
-<h2>Compose Message 📩</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Send</button>
-</form>
-<a href="{% url 'postbox:timeline' %}">Timeline</a>
 
+<section class="event-create container">
+  <h2>🎉 Add New Event</h2>
 
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
 
+    <!-- 🔹 عنوان الحدث -->
+    <div class="form-group">
+      <label for="id_title">Title:</label>
+      {{ form.title }}
+    </div>
+
+    <!-- 🔹 وصف الحدث -->
+    <div class="form-group">
+      <label for="id_description">Description:</label>
+      {{ form.description }}
+    </div>
+
+    <!-- 🔹 تاريخ الحدث -->
+    <div class="form-group">
+      <label for="id_event_date">Event Date:</label>
+      {{ form.event_date }}
+    </div>
+
+    <!-- 🔹 نوع الحدث -->
+    <div class="form-group">
+      <label for="id_event_type">Event Type:</label>
+      {{ form.event_type }}
+    </div>
+
+    <!-- 🔹 حقل إضافي يظهر فقط عند اختيار Other -->
+    <div id="custom-type-field" class="form-group" style="display:none;">
+      <label for="custom_event_type">Enter Custom Event Type:</label>
+      <input type="text" name="custom_event_type" id="custom_event_type" class="form-control" placeholder="Enter your event type">
+    </div>
+
+    <!-- 🔹 الصورة (اختياري) -->
+    <div class="form-group">
+      <label for="id_image">Upload Image (optional):</label>
+      {{ form.image }}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Event</button>
+  </form>
+
+  <div class="links mt-3">
+    <a href="{% url 'postbox:timeline' %}" class="btn btn-secondary">Back to Timeline</a>
+  </div>
+</section>
+
+<!-- ✨ JavaScript: إظهار حقل "Other" فقط عند الحاجة -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const eventTypeSelect = document.getElementById('id_event_type');
+  const customField = document.getElementById('custom-type-field');
+
+  function toggleCustomField() {
+    if (eventTypeSelect.value === 'other') {
+      customField.style.display = 'block';
+    } else {
+      customField.style.display = 'none';
+    }
+  }
+
+  // شغل التحقق أول مرة عند تحميل الصفحة
+  toggleCustomField();
+
+  // حدث عند تغيير الاختيار
+  eventTypeSelect.addEventListener('change', toggleCustomField);
+});
+</script>
+
+<style>
+  .event-create {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+  }
+  input, select, textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+  .btn-primary {
+    background-color: #4a90e2;
+    color: #fff;
+    width: 100%;
+    border: none;
+    padding: 0.7rem;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .btn-primary:hover {
+    background-color: #357ABD;
+  }
+  .btn-secondary {
+    background-color: #aaa;
+    color: #fff;
+    display: block;
+    text-align: center;
+    border-radius: 8px;
+    padding: 0.7rem;
+  }
+</style>
 
 {% endblock %}

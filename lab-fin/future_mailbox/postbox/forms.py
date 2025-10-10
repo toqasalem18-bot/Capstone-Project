@@ -4,7 +4,7 @@ from .models import Event, Comment
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ['title', 'description', 'event_date']
+        fields = ['title', 'description', 'event_date', 'event_type']
 
 class CommentForm(forms.ModelForm):
     content = forms.CharField(
@@ -18,3 +18,11 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ['content']
+
+from django import forms
+from .models import Message
+
+class MessageForm(forms.ModelForm):
+    class Meta:
+        model = Message
+        fields = '__all__'

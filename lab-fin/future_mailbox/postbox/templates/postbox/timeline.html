@@ -1,64 +1,161 @@
 {% extends 'postbox/base.html' %}
-
-
 {% block content %}
-<div class="timeline-container">
-    <h2>All Events Timeline</h2>
-    {% if events %}
-        <ul class="events-list">
-            {% for event in events %}
-                <li>
-                    <a href="{% url 'postbox:event_detail' event.pk %}">
-                        <strong>{{ event.title }}</strong> — {{ event.event_date }} by {{ event.user.username }}
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No events yet. Be the first to create one!</p>
-    {% endif %}
-    <a href="{% url 'postbox:event_create' %}" class="btn-create-event">+ Add Event</a>
-</div>
+<section class="timeline">
+    <h1>🌟 Community Timeline</h1>
+    <div id="timeline-events">
+        {% for event in event_list %}
+        <div class="event-card" data-event-id="{{ event.id }}" style="border-left: 6px solid {{ event.get_color }}">
+            <div class="event-header">
+                <div class="event-avatar">{{ event.user.username|first }}</div>
+                <div>
+                    <h2 class="event-title">{{ event.title }}</h2>
+                    <div class="event-meta">By <strong>{{ event.user.username }}</strong> — {{ event.event_date|date:"M d, Y" }}</div>
+                </div>
+            </div>
+            <p class="event-description">{{ event.description|truncatewords:25 }}</p>
+            <div class="event-actions">
+                <button class="btn btn-reaction" data-reaction="heart">❤️ {{ event.hearts }}</button>
+                <button class="btn btn-reaction" data-reaction="thumbs">👍 {{ event.thumbs }}</button>
+                <button class="btn btn-reaction" data-reaction="tada">🎉 {{ event.tada }}</button>
+                <a href="{% url 'postbox:event_detail' event.id %}" class="btn btn-detail">Celebrate 🎉</a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="no-events">
+            <p>💛 No events yet — be the first to share your happy moment!</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
 
 <style>
-.timeline-container {
-    max-width: 700px;
-    margin: 0 auto;
+/* ================= Timeline & Event Cards ================= */
+.timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    width: 85%;
+    max-width: 900px;
+    margin: 40px auto;
+}
+
+.event-card {
+    background: #fff;
+    border-radius: 12px;
     padding: 20px;
-    color: #fff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-left: 6px solid #A9A9A9;
 }
 
-.events-list {
-    list-style: none;
-    padding: 0;
+.event-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.15);
 }
 
-.events-list li {
-    padding: 10px;
+.event-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
     margin-bottom: 10px;
-    background: rgba(0,0,0,0.2);
-    border-radius: 8px;
 }
 
-.events-list li a {
+.event-avatar {
+    width: 40px;
+    height: 40px;
+    background: #777;
     color: #fff;
-    text-decoration: none;
-    font-weight: bold;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    font-size: 1.2rem;
 }
 
-.btn-create-event {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 10px 20px;
-    background: linear-gradient(90deg, #4e54c8, #8f94fb);
+.event-title {
+    margin: 0;
+    color: #333;
+    font-size: 1.5rem;
+}
+
+.event-meta {
+    color: #777;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+.event-description {
+    color: #555;
+    line-height: 1.5;
+}
+
+.event-actions {
+    margin-top: 10px;
+}
+
+.btn {
+    background: #ff6b6b;
     color: #fff;
+    padding: 8px 15px;
     border-radius: 8px;
+    font-weight: 600;
     text-decoration: none;
-    font-weight: bold;
+    margin-top: 5px;
+    cursor: pointer;
 }
 
-.btn-create-event:hover {
-    opacity: 0.9;
+.btn:hover {
+    background: #ff856b;
+}
+
+.btn-reaction {
+    background: #eee;
+    color: #333;
+    margin-right: 5px;
+}
+
+.no-events {
+    text-align: center;
+    color: #777;
+    font-size: 1.1rem;
+    margin-top: 40px;
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const timeline = document.querySelector('#timeline-events');
+
+    timeline.addEventListener('click', function(e){
+        if(e.target.classList.contains('btn-reaction')){
+            const btn = e.target;
+            const reaction = btn.dataset.reaction;
+            const eventCard = btn.closest('.event-card');
+            const eventId = eventCard.dataset.eventId;
+
+            fetch(`/timeline/react/${eventId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: `reaction=${reaction}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(!data.error){
+                    if(reaction === 'heart') btn.textContent = `❤️ ${data.hearts}`;
+                    else if(reaction === 'thumbs') btn.textContent = `👍 ${data.thumbs}`;
+                    else if(reaction === 'tada') btn.textContent = `🎉 ${data.tada}`;
+                }
+            });
+        }
+    });
+});
+</script>
+
 {% endblock %}
