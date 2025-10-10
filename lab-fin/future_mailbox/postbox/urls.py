@@ -9,10 +9,10 @@ from .views import (
 app_name = 'postbox'
 
 urlpatterns = [
-    # Timeline feed
+  
   path('timeline/', EventListView.as_view(), name='timeline'),
 
-    # Event Detail
+
     path('event/<int:pk>/', EventDetailView.as_view(), name='event_detail'),
 
     # Event CRUD

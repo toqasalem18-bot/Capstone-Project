@@ -5,14 +5,17 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
 
-from .models import Event, Comment
-from .forms import EventForm, CommentForm
+from .models import Event, Comment, Message, Notification
+from .forms import EventForm, CommentForm, MessageForm
+from .utils import create_notification
 
-from .models import Message  
-from .forms import MessageForm     
-
+# ==========================
+# Compose Message
+# ==========================
 @login_required(login_url='/accounts/login/')
 def compose_message(request):
     if request.method == 'POST':
@@ -21,51 +24,51 @@ def compose_message(request):
             message = form.save(commit=False)
             message.created_by = request.user
             message.save()
-            return redirect('postbox:timeline')  
+            return redirect('postbox:timeline')
     else:
         form = MessageForm()
-
-  
     events = Event.objects.filter(user=request.user)
-
     return render(request, 'postbox/message_form.html', {'form': form, 'events': events})
 
-
-
-
-from django.views.decorators.http import require_POST
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
+# ==========================
+# React to Event
+# ==========================
 @require_POST
 def react_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     reaction_type = request.POST.get('reaction')
-
     if reaction_type == 'heart':
         event.hearts += 1
+        create_notification(request.user, event, 'heart')
     elif reaction_type == 'thumbs':
         event.thumbs += 1
+        create_notification(request.user, event, 'thumbs')
     elif reaction_type == 'tada':
         event.tada += 1
+        create_notification(request.user, event, 'tada')
     else:
         return JsonResponse({'error': 'Invalid reaction'}, status=400)
-
     event.save()
-    return JsonResponse({
-        'hearts': event.hearts,
-        'thumbs': event.thumbs,
-        'tada': event.tada
-    })
+    return JsonResponse({'hearts': event.hearts, 'thumbs': event.thumbs, 'tada': event.tada})
 
 # ==========================
-# Timeline 
+# Timeline
 # ==========================
 class EventListView(ListView):
     model = Event
     template_name = 'postbox/timeline.html'
-    context_object_name = 'event_list'  
-    ordering = ['-event_date', '-created_at']   
+    context_object_name = 'event_list'
+    ordering = ['-event_date', '-created_at']
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            context['unread_count'] = self.request.user.notifications.filter(is_read=False).count()
+            context['all_notifications'] = self.request.user.notifications.all().order_by('-created_at')
+        else:
+            context['unread_count'] = 0
+            context['all_notifications'] = []
+        return context
 
 # ==========================
 # Event Detail + Comments
@@ -89,16 +92,14 @@ class EventDetailView(DetailView):
             comment.user = request.user
             comment.event = self.object
             comment.save()
+            create_notification(request.user, self.object, 'comment')
             return redirect('postbox:event_detail', pk=self.object.pk)
         context = self.get_context_data(form=form)
         return self.render_to_response(context)
 
 # ==========================
-# Event Create
+# Event CRUD
 # ==========================
-from django.http import JsonResponse
-from django.urls import reverse
-
 class EventCreateView(LoginRequiredMixin, CreateView):
     model = Event
     form_class = EventForm
@@ -108,14 +109,10 @@ class EventCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         event = form.save(commit=False)
         event.user = self.request.user
-
         custom_type = self.request.POST.get('custom_event_type')
         if form.cleaned_data.get('event_type') == 'other' and custom_type:
             event.event_type = custom_type
-
         event.save()
-
-        
         if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({
                 'success': True,
@@ -125,7 +122,6 @@ class EventCreateView(LoginRequiredMixin, CreateView):
                 'user': event.user.username,
                 'detail_url': reverse('postbox:event_detail', args=[event.id])
             })
-
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -133,9 +129,6 @@ class EventCreateView(LoginRequiredMixin, CreateView):
             return JsonResponse({'success': False, 'error': form.errors.as_json()})
         return super().form_invalid(form)
 
-# ==========================
-# Event Update
-# ==========================
 class EventUpdateView(LoginRequiredMixin, UpdateView):
     model = Event
     form_class = EventForm
@@ -145,9 +138,6 @@ class EventUpdateView(LoginRequiredMixin, UpdateView):
     def get_queryset(self):
         return Event.objects.filter(user=self.request.user)
 
-# ==========================
-# Event Delete
-# ==========================
 class EventDeleteView(LoginRequiredMixin, DeleteView):
     model = Event
     template_name = 'postbox/event_confirm_delete.html'
@@ -157,14 +147,12 @@ class EventDeleteView(LoginRequiredMixin, DeleteView):
         return Event.objects.filter(user=self.request.user)
 
 # ==========================
-# Signup / Registration
+# Signup
 # ==========================
 def signup_view(request):
     if request.user.is_authenticated:
         return redirect('postbox:timeline')
-
     form = UserCreationForm(request.POST or None)
-
     if request.method == 'POST':
         if form.is_valid():
             user = form.save()
@@ -172,13 +160,20 @@ def signup_view(request):
             return redirect('postbox:timeline')
         else:
             messages.error(request, "Please correct the errors below.")
-
     return render(request, 'postbox/signup.html', {'form': form})
 
 # ==========================
-# My Events (User's own events)
+# My Events
 # ==========================
 @login_required(login_url='/accounts/login/')
 def my_events(request):
     events = Event.objects.filter(user=request.user).order_by('-event_date')
     return render(request, 'postbox/my_events.html', {'events': events})
+
+# ==========================
+# Notifications
+# ==========================
+@login_required
+def notifications_view(request):
+    notifications = Notification.objects.filter(recipient=request.user).order_by('-created_at')
+    return render(request, 'postbox/notifications.html', {'notifications': notifications})
