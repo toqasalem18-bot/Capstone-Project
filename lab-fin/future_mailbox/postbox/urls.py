@@ -21,7 +21,9 @@ urlpatterns = [
     path('event/<int:pk>/delete/', EventDeleteView.as_view(), name='event_delete'),
 
     # My Events
-     path('timeline/react/<int:event_id>/', views.react_event, name='react_event'),
+
+
+    path('timeline/react/<int:event_id>/', views.react_event, name='react_event'),
     path('my-events/', my_events, name='my_events'),
     path('messages/compose/', views.compose_message, name='compose_message'),
     # Authentication

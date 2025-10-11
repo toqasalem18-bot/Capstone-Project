@@ -8,7 +8,6 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.urls import reverse_lazy, reverse
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
-
 from .models import Event, Comment, Message, Notification
 from .forms import EventForm, CommentForm, MessageForm
 from .utils import create_notification
