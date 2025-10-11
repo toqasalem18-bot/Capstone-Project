@@ -37,7 +37,7 @@ body.dark-mode .event-detail {
     line-height: 1.6;
 }
 
-/* ===== Divider ===== */
+
 hr {
     border: none;
     border-top: 1px solid #ddd;
@@ -135,7 +135,7 @@ button[type="submit"]:hover {
     background-color: #1e40af;
 }
 
-/* ===== Back Link ===== */
+/* ===== Back ===== */
 .back-link {
     display: inline-block;
     margin-top: 15px;
@@ -145,7 +145,7 @@ button[type="submit"]:hover {
 }
 .back-link:hover { text-decoration: underline; }
 
-/* ===== Animation ===== */
+
 .comment.fade-in { 
     animation: fadeIn 0.4s ease forwards;
 }
@@ -261,13 +261,13 @@ function attachCommentEvents(commentDiv){
 
             const actionsDiv = commentDiv.querySelector('.comment-actions');
 
-            // Create Save Button
+            //  Save Button
             const saveBtn = document.createElement('button');
             saveBtn.textContent = 'Save';
             saveBtn.classList.add('save-btn');
             actionsDiv.appendChild(saveBtn);
 
-            // Create Cancel Button
+            //  Cancel Button
             const cancelBtn = document.createElement('button');
             cancelBtn.textContent = 'Cancel';
             cancelBtn.classList.add('cancel-btn');
@@ -325,7 +325,7 @@ function attachCommentEvents(commentDiv){
     }
 }
 
-// Attach events to existing comments
+
 document.querySelectorAll('.comment').forEach(attachCommentEvents);
 </script>
 {% endblock %}

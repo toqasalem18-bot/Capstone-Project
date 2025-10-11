@@ -5,7 +5,7 @@ User = get_user_model()
 
 
 class Event(models.Model):
-    EVENT_TYPE_CHOICES = [
+    EVENT_TYPES = [
         ('birthday', 'Birthday'),
         ('graduation', 'Graduation'),
         ('anniversary', 'Anniversary'),
@@ -15,7 +15,8 @@ class Event(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     event_date = models.DateField()
-    event_type = models.CharField(max_length=50)
+    event_type = models.CharField(max_length=50, choices=EVENT_TYPES, default='other')
+    custom_event_type = models.CharField(max_length=100, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     hearts = models.PositiveIntegerField(default=0)
     thumbs = models.PositiveIntegerField(default=0)
@@ -29,7 +30,7 @@ class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    hearts = models.PositiveIntegerField(default=0)  # ← أضفت default=0
+    hearts = models.PositiveIntegerField(default=0) 
 
     def __str__(self):
         return f"Comment by {self.user.username} on {self.event.title}"

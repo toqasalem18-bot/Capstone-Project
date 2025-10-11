@@ -3,59 +3,174 @@
 
 {% block content %}
 <div class="event-form-container">
-    <h2>Edit Event ✏️</h2>
+    <h2>Edit Event</h2>
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Update Event</button>
+        {{ form.non_field_errors }}
+        
+        <div class="form-group">
+            {{ form.title.label_tag }}
+            {{ form.title }}
+            {{ form.title.errors }}
+        </div>
+
+        <div class="form-group">
+            {{ form.description.label_tag }}
+            {{ form.description }}
+            {{ form.description.errors }}
+        </div>
+
+        <div class="form-group">
+            {{ form.event_date.label_tag }}
+            {{ form.event_date }}
+            {{ form.event_date.errors }}
+        </div>
+
+        <div class="form-group">
+            {{ form.event_type.label_tag }}
+            {{ form.event_type }}
+            {{ form.event_type.errors }}
+        </div>
+
+        <div class="form-group" id="custom_event_container" style="display:none;">
+            {{ form.custom_event_type.label_tag }}
+            {{ form.custom_event_type }}
+            {{ form.custom_event_type.errors }}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-update">Update</button>
+            <a href="{% url 'postbox:timeline' %}" class="btn btn-cancel">Cancel</a>
+        </div>
     </form>
-    <p><a href="{% url 'postbox:timeline' %}">← Back to Timeline</a></p>
 </div>
 
 <style>
 .event-form-container {
     max-width: 500px;
-    margin: 20px auto;
-    padding: 25px;
-    background: rgba(255,255,255,0.05);
+    margin: 40px auto;
+    padding: 30px;
+    background: #f1f5f9;
     border-radius: 12px;
-    backdrop-filter: blur(8px);
-    color: #bc9999;
-    text-align: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    font-family: "Poppins", sans-serif;
 }
 
 .event-form-container h2 {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    color: #1e293b;
+    text-align: center;
+    font-size: 1.8rem;
 }
 
-.event-form-container form input,
-.event-form-container form textarea {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
+.form-group {
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #334155;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    padding: 10px 12px;
     border-radius: 8px;
-    border: none;
-    background: rgba(255,255,255,0.2);
-    color: #bca1a1;
+    border: 1px solid #cbd5e1;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.2s ease;
 }
 
-button {
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.btn {
     padding: 10px 20px;
-    border: none;
     border-radius: 8px;
-    background: linear-gradient(90deg, #4e54c8, #8f94fb);
-    color: #554d4d;
-    font-weight: bold;
+    font-weight: 500;
+    text-decoration: none;
+    font-size: 0.95rem;
     cursor: pointer;
+    transition: 0.2s;
+    border: none;
 }
 
-button:hover {
+.btn-update {
+    background: linear-gradient(90deg, #4e54c8, #8f94fb);
+    color: #fff;
+}
+.btn-update:hover {
     opacity: 0.9;
 }
 
-a {
-    color: #8f94fb;
-    text-decoration: none;
+.btn-cancel {
+    background: #e2e8f0;
+    color: #334155;
+    text-align: center;
 }
+.btn-cancel:hover {
+    background: #cbd5e1;
+}
+
+/* ===== Dark Mode ===== */
+body.dark-mode .event-form-container {
+    background: #1e293b;
+    color: #f1f5f9;
+}
+body.dark-mode .form-group label { color: #93c5fd; }
+body.dark-mode .form-group input,
+body.dark-mode .form-group textarea,
+body.dark-mode .form-group select {
+    background: #334155;
+    border: 1px solid #475569;
+    color: #e2e8f0;
+}
+body.dark-mode .form-group input:focus,
+body.dark-mode .form-group textarea:focus,
+body.dark-mode .form-group select:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+}
+body.dark-mode .btn-update { color: #fff; }
+body.dark-mode .btn-cancel { background: #475569; color: #f1f5f9; }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const select = document.getElementById('event_type_select');
+    const customContainer = document.getElementById('custom_event_container');
+
+    function toggleCustomField(){
+        if(select.value === 'other'){
+            customContainer.style.display = 'block';
+        } else {
+            customContainer.style.display = 'none';
+        }
+    }
+
+    select.addEventListener('change', toggleCustomField);
+    toggleCustomField();  
+});
+</script>
 {% endblock %}

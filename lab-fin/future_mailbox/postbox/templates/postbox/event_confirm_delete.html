@@ -1,6 +1,61 @@
-<h2>Are you sure you want to delete "{{ object.title }}"?</h2>
-<form method="post">
+<section class="delete-event container">
+  <h2>⚠️ Are you sure you want to delete "<span class="event-title">{{ object.title }}</span>"?</h2>
+
+  <form method="post">
     {% csrf_token %}
-    <button type="submit">Yes, delete</button>
-    <a href="{% url 'postbox:my_events' %}">Cancel</a>
-</form>
+    <div class="btn-group">
+      <button type="submit" class="btn btn-danger">Yes, delete</button>
+      <a href="{% url 'postbox:my_events' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</section>
+
+<style>
+.delete-event {
+  max-width: 500px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background: #fef2f2;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  text-align: center;
+}
+.delete-event h2 {
+  font-size: 1.8rem;
+  color: #b91c1c;
+  margin-bottom: 2rem;
+}
+.delete-event .event-title {
+  font-weight: 700;
+  color: #7f1d1d;
+}
+.btn-group {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+.btn {
+  padding: 0.7rem 1.5rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: 0.3s;
+  border: none;
+}
+.btn-danger {
+  background-color: #b91c1c;
+  color: #fff;
+}
+.btn-danger:hover {
+  background-color: #7f1d1d;
+}
+.btn-secondary {
+  background-color: #94a3b8;
+  color: #fff;
+}
+.btn-secondary:hover {
+  background-color: #64748b;
+}
+</style>
