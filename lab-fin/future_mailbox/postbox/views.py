@@ -8,6 +8,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.urls import reverse_lazy, reverse
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
+
 from .models import Event, Comment, Message, Notification
 from .forms import EventForm, CommentForm, MessageForm
 from .utils import create_notification
@@ -72,6 +73,16 @@ class EventListView(ListView):
 # ==========================
 # Event Detail + Comments
 # ==========================
+from django.http import JsonResponse
+from django.views.generic import DetailView
+from django.shortcuts import get_object_or_404, redirect
+from django.http import JsonResponse
+from .models import Event, Comment
+from .forms import CommentForm
+from .utils import create_notification
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+@method_decorator(login_required, name='dispatch')
 class EventDetailView(DetailView):
     model = Event
     template_name = 'postbox/event_detail.html'
@@ -80,6 +91,7 @@ class EventDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = CommentForm()
+      
         context['comments'] = self.object.comments.all().order_by('-created_at')
         return context
 
@@ -91,10 +103,54 @@ class EventDetailView(DetailView):
             comment.user = request.user
             comment.event = self.object
             comment.save()
-            create_notification(request.user, self.object, 'comment')
+
+          
+            if comment.user != self.object.user:
+                create_notification(comment.user, self.object, 'comment')
+
+          
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'user': comment.user.username,
+                    'content': comment.content,
+                    'created_at': comment.created_at.strftime('%b %d, %Y %H:%M'),
+                    'comment_id': comment.id
+                })
+
             return redirect('postbox:event_detail', pk=self.object.pk)
+
         context = self.get_context_data(form=form)
         return self.render_to_response(context)
+    
+from django.views.decorators.http import require_POST
+from django.shortcuts import redirect
+
+
+@login_required
+def edit_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    if comment.user != request.user:
+        return JsonResponse({'error': 'Not allowed'}, status=403)
+
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        comment.content = content
+        comment.save()
+        return JsonResponse({'success': True, 'content': comment.content})
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    if comment.user != request.user and comment.event.user != request.user:
+        return JsonResponse({'error': 'Not allowed'}, status=403)
+    comment.delete()
+    return JsonResponse({'success': True})
+
 
 # ==========================
 # Event CRUD
@@ -164,10 +220,15 @@ def signup_view(request):
 # ==========================
 # My Events
 # ==========================
-@login_required(login_url='/accounts/login/')
+from django.shortcuts import render
+from .models import Event
+from django.contrib.auth.decorators import login_required
+
+@login_required
 def my_events(request):
-    events = Event.objects.filter(user=request.user).order_by('-event_date')
-    return render(request, 'postbox/my_events.html', {'events': events})
+    event_list = Event.objects.filter(user=request.user).order_by('-event_date')
+    return render(request, 'postbox/my_events.html', {'event_list': event_list})
+
 
 # ==========================
 # Notifications

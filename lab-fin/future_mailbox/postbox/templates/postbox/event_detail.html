@@ -2,39 +2,330 @@
 {% load static %}
 
 {% block content %}
-<div class="event-detail-container">
-  <h2>{{ event.title }}</h2>
-  <p>{{ event.description }}</p>
-  <p><strong>Date:</strong> {{ event.event_date }}</p>
-  <p><strong>Created by:</strong> {{ event.user.username }}</p>
+<style>
+/* ===== Body & General ===== */
+body {
+    background-color: #f7f9fb;
+    font-family: "Poppins", sans-serif;
+}
+body.dark-mode {
+    background-color: #0f172a;
+    color: #f1f5f9;
+}
 
-  <hr>
+/* ===== Event Detail Card ===== */
+.event-detail {
+    max-width: 750px;
+    margin: 40px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    transition: background 0.3s, color 0.3s;
+}
+body.dark-mode .event-detail {
+    background: #1e293b;
+    color: #f1f5f9;
+}
 
-  <h3>Comments</h3>
-  <div class="comments">
-    {% for comment in comments %}
-      <div class="comment">
-        <p><strong>{{ comment.user.username }}</strong> said:</p>
-        <p>{{ comment.content }}</p>
-        <p><small>{{ comment.created_at }}</small></p>
-      </div>
-    {% empty %}
-      <p>No comments yet. Be the first to comment!</p>
-    {% endfor %}
-  </div>
+/* ===== Headings ===== */
+.event-detail h2 {
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+.event-detail p {
+    line-height: 1.6;
+}
 
-  {% if user.is_authenticated %}
+/* ===== Divider ===== */
+hr {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 20px 0;
+}
+
+/* ===== Comments Section ===== */
+.comments-section h3 {
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+.comment {
+    background-color: #f9fafc;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    position: relative;
+    transition: 0.3s;
+    opacity: 1;
+}
+body.dark-mode .comment {
+    background-color: #1f2937;
+}
+.comment:hover {
+    background-color: #f1f4f8;
+}
+body.dark-mode .comment:hover {
+    background-color: #374151;
+}
+.comment strong {
+    display: block;
+    margin-bottom: 8px;
+}
+.comment small {
+    color: #888;
+    font-size: 12px;
+}
+.comment-actions {
+    margin-top: 8px;
+}
+.comment-actions button {
+    background: none;
+    border: none;
+    font-size: 13px;
+    cursor: pointer;
+    margin-right: 8px;
+    transition: 0.2s;
+}
+.comment-actions .edit-btn { color: #2563eb; }
+.comment-actions .edit-btn:hover { color: #1e40af; }
+.comment-actions .delete-btn { color: #d32f2f; }
+.comment-actions .delete-btn:hover { color: #b71c1c; }
+.comment-actions .save-btn, .comment-actions .cancel-btn {
+    background: none;
+    border: none;
+    font-size: 13px;
+    cursor: pointer;
+    margin-right: 6px;
+    color: #2563eb;
+    transition: color 0.2s;
+}
+.comment-actions .save-btn:hover { color: #1e40af; }
+.comment-actions .cancel-btn:hover { color: #d32f2f; }
+
+/* ===== Add Comment Form ===== */
+.add-comment h3 {
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+textarea {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    resize: none;
+    font-size: 14px;
+    outline: none;
+    transition: 0.2s;
+}
+textarea:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
+}
+button[type="submit"] {
+    padding: 10px 20px;
+    background-color: #2563eb;
+    border: none;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.3s;
+}
+button[type="submit"]:hover {
+    background-color: #1e40af;
+}
+
+/* ===== Back Link ===== */
+.back-link {
+    display: inline-block;
+    margin-top: 15px;
+    text-decoration: none;
+    font-size: 14px;
+    color: #2563eb;
+}
+.back-link:hover { text-decoration: underline; }
+
+/* ===== Animation ===== */
+.comment.fade-in { 
+    animation: fadeIn 0.4s ease forwards;
+}
+@keyframes fadeIn { 
+    from {opacity:0; transform: translateY(-5px);} 
+    to {opacity:1; transform:translateY(0);}
+}
+</style>
+
+<div class="event-detail">
+    <!-- Event Info -->
+    <h2>{{ event.title }}</h2>
+    <p><strong>Date:</strong> {{ event.event_date|date:"M. d, Y" }}</p>
+    <p>{{ event.description }}</p>
+    <p><em>Created by: {{ event.user.username }}</em></p>
     <hr>
-    <h3>Add a Comment</h3>
-    <form method="post">
-      {% csrf_token %}
-      {{ comment_form.as_p }}
-      <button type="submit">Submit Comment</button>
-    </form>
-  {% else %}
-    <p><a href="{% url 'postbox:login' %}">Login</a> to add a comment.</p>
-  {% endif %}
 
-  <a href="{% url 'postbox:timeline' %}">Back to Timeline</a>
+    <!-- Comments Section -->
+    <div class="comments-section">
+        <h3>Comments</h3>
+        <div id="comments-list">
+            {% for comment in event.comments.all|dictsortreversed:"created_at" %}
+                <div class="comment fade-in" data-id="{{ comment.id }}">
+                    <strong>{{ comment.user.username }} said:</strong>
+                    <p>{{ comment.content }}</p>
+                    <small>{{ comment.created_at|date:"M. d, Y, h:i a" }}</small>
+                    <div class="comment-actions">
+                        {% if comment.user == user %}
+                            <button class="edit-btn" data-id="{{ comment.id }}">Edit</button>
+                        {% endif %}
+                        {% if comment.user == user or event.user == user %}
+                            <button class="delete-btn" data-id="{{ comment.id }}">Delete</button>
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                <p style="color:#777;">No comments yet. Be the first to comment!</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Add Comment Form -->
+    {% if user.is_authenticated %}
+    <div class="add-comment">
+        <h3>Add a Comment</h3>
+        <form id="comment-form" method="POST" action="{% url 'postbox:event_detail' event.id %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Submit Comment</button>
+        </form>
+    </div>
+    {% else %}
+        <p><a href="{% url 'postbox:login' %}">Log in</a> to add a comment.</p>
+    {% endif %}
+
+    <hr>
+    <a href="{% url 'postbox:timeline' %}" class="back-link">&larr; Back to Home</a>
 </div>
+
+<script>
+// ====================== Add Comment via AJAX ======================
+document.getElementById('comment-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    const form = this;
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success){
+            const commentsList = document.getElementById('comments-list');
+            const newCommentDiv = document.createElement('div');
+            newCommentDiv.classList.add('comment', 'fade-in');
+            newCommentDiv.setAttribute('data-id', data.comment_id);
+            newCommentDiv.innerHTML = `
+                <strong>${data.user} said:</strong>
+                <p>${data.content}</p>
+                <small>${data.created_at}</small>
+                <div class="comment-actions">
+                    <button class="edit-btn" data-id="${data.comment_id}">Edit</button>
+                    <button class="delete-btn" data-id="${data.comment_id}">Delete</button>
+                </div>
+            `;
+            commentsList.prepend(newCommentDiv);
+            form.reset();
+            attachCommentEvents(newCommentDiv);
+        }
+    });
+});
+
+// ====================== Edit & Delete Comment ======================
+function attachCommentEvents(commentDiv){
+    const editBtn = commentDiv.querySelector('.edit-btn');
+    const deleteBtn = commentDiv.querySelector('.delete-btn');
+
+    if(editBtn){
+        editBtn.addEventListener('click', function(){
+            const p = commentDiv.querySelector('p');
+            const originalText = p.textContent;
+            const textarea = document.createElement('textarea');
+            textarea.value = originalText;
+            textarea.style.marginTop = "8px";
+            commentDiv.replaceChild(textarea, p);
+
+            const actionsDiv = commentDiv.querySelector('.comment-actions');
+
+            // Create Save Button
+            const saveBtn = document.createElement('button');
+            saveBtn.textContent = 'Save';
+            saveBtn.classList.add('save-btn');
+            actionsDiv.appendChild(saveBtn);
+
+            // Create Cancel Button
+            const cancelBtn = document.createElement('button');
+            cancelBtn.textContent = 'Cancel';
+            cancelBtn.classList.add('cancel-btn');
+            actionsDiv.appendChild(cancelBtn);
+
+            saveBtn.addEventListener('click', function(){
+                const newContent = textarea.value;
+                fetch(`/comment/${editBtn.dataset.id}/edit/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `content=${encodeURIComponent(newContent)}`
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success){
+                        const pNew = document.createElement('p');
+                        pNew.textContent = data.content;
+                        commentDiv.replaceChild(pNew, textarea);
+                        saveBtn.remove();
+                        cancelBtn.remove();
+                    }
+                });
+            });
+
+            cancelBtn.addEventListener('click', function(){
+                commentDiv.replaceChild(p, textarea);
+                saveBtn.remove();
+                cancelBtn.remove();
+            });
+        });
+    }
+
+    if(deleteBtn){
+        deleteBtn.addEventListener('click', function(){
+            if(confirm("Are you sure you want to delete this comment?")){
+                fetch(`/comment/${deleteBtn.dataset.id}/delete/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success){
+                        commentDiv.remove();
+                    }
+                });
+            }
+        });
+    }
+}
+
+// Attach events to existing comments
+document.querySelectorAll('.comment').forEach(attachCommentEvents);
+</script>
 {% endblock %}

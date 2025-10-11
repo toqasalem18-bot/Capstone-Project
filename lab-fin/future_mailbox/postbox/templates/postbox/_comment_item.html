@@ -1,0 +1,64 @@
+{# postbox/_comment_item.html #}
+<div class="comment-item" data-comment-id="{{ comment.id }}">
+    <div class="comment-head" style="display:flex;gap:10px;align-items:flex-start;">
+        
+        <!-- Avatar -->
+        <div class="comment-avatar" 
+             style="width:36px;height:36px;border-radius:50%;
+                    background:#93c5fd;color:#fff;
+                    display:flex;align-items:center;justify-content:center;
+                    font-weight:700;">
+            {{ comment.user.username|first }}
+        </div>
+
+        <div style="flex:1;">
+            <!-- Username + time -->
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <strong>{{ comment.user.username }}</strong>
+                    <span style="color:#64748b;font-size:0.85rem;margin-left:8px;">
+                        {{ comment.created_at|date:"M d, H:i" }}
+                    </span>
+                </div>
+
+                <!-- Edit/Delete buttons -->
+                <div>
+                    {% if user == comment.user %}
+                        <button class="btn-edit-comment" data-id="{{ comment.id }}"
+                                style="background:none;border:none;cursor:pointer;color:#2563eb;">
+                            ✏️ Edit
+                        </button>
+                        <button class="btn-delete-comment" data-id="{{ comment.id }}"
+                                style="background:none;border:none;cursor:pointer;color:#ef4444;">
+                            🗑️ Delete
+                        </button>
+                    {% elif user == comment.event.user %}
+                        <!-- صاحب الحدث يستطيع حذف أي تعليق -->
+                        <button class="btn-delete-comment" data-id="{{ comment.id }}"
+                                style="background:none;border:none;cursor:pointer;color:#ef4444;">
+                            🗑️ Delete
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Comment content -->
+            <p class="comment-content" style="margin:6px 0; line-height:1.5;">
+                {{ comment.content|linebreaksbr }}
+            </p>
+
+            <!-- Reactions -->
+            <div style="display:flex;gap:8px;align-items:center;margin-top:5px;">
+                <button class="btn btn-comment-react" data-comment-id="{{ comment.id }}" data-reaction="heart">
+                    ❤️ <span class="count-hearts">{{ comment.hearts }}</span>
+                </button>
+                <button class="btn btn-comment-react" data-comment-id="{{ comment.id }}" data-reaction="thumbs">
+                    👍 <span class="count-thumbs">{{ comment.thumbs }}</span>
+                </button>
+                <button class="btn btn-comment-react" data-comment-id="{{ comment.id }}" data-reaction="tada">
+                    🎉 <span class="count-tada">{{ comment.tada }}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

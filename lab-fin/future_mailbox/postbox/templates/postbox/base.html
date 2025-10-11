@@ -11,80 +11,81 @@
 body {
     font-family:'Segoe UI', sans-serif;
     margin:0; padding:0;
-    background:#f5f7fa; color:#111827;
+    background:#f8fafc; color:#111827;
     transition:0.3s;
 }
 body.dark-mode { background:#121212; color:#f5f5f5; }
 
-/* ===== Header & Nav  ===== */
+/* ===== Header (Elegant Animated Gradient) ===== */
 header {
-    background: linear-gradient(135deg, #dbeafe, #fdf2f8);
+    background: linear-gradient(120deg, #f4f3ff, #fef6f9, #f0f9ff);
+    background-size: 300% 300%;
+    animation: gradientShift 12s ease infinite;
     color:#1e293b;
-    padding:20px 60px; 
+    padding:24px 65px; 
     display:flex;
     justify-content:space-between;
     align-items:center;
-    box-shadow:0 2px 15px rgba(0,0,0,0.08);
+    box-shadow:0 3px 20px rgba(0,0,0,0.08);
     position:sticky;
     top:0;
     z-index:1000;
-    transition: background 0.3s, box-shadow 0.3s, transform 0.3s, padding 0.3s;
     border-radius:0 0 25px 25px;
+    transition:all 0.4s ease;
 }
-body.dark-mode header { 
-    background: linear-gradient(135deg, #1e293b, #374151);
-    color:#f1f5f9;
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 header.scrolled {
-    box-shadow:0 8px 30px rgba(0,0,0,0.2);
-    padding:15px 60px; 
+    box-shadow:0 10px 25px rgba(0,0,0,0.15);
+    padding:15px 60px;
+    background: linear-gradient(135deg, #ede9fe, #fdf2f8, #dbeafe);
+    background-size: 200% 200%;
+}
+body.dark-mode header {
+    background: linear-gradient(120deg, #1f2937, #334155, #475569);
+    background-size: 300% 300%;
+    animation: gradientShiftDark 14s ease infinite;
+    color:#f1f5f9;
+}
+@keyframes gradientShiftDark {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
 }
 
-/* Logo */
+/* ===== Logo ===== */
 .logo {
     font-size:2.5rem;
     font-weight:700;
-    transition: transform 0.4s ease, color 0.3s;
+    transition:transform 0.4s ease, color 0.3s;
 }
 .logo:hover {
-    transform: scale(1.1) rotate(-2deg);
-    color:#2563eb;
+    transform:scale(1.1) rotate(-2deg);
+    color:#8b5cf6;
 }
-body.dark-mode .logo:hover { color:#93c5fd; }
 
-/* Nav */
-nav ul {
-    list-style:none; display:flex; gap:25px; margin:0; padding:0; align-items:center;
-}
+/* ===== Nav Buttons ===== */
+nav ul { list-style:none; display:flex; gap:25px; margin:0; padding:0; align-items:center; }
 nav ul li a, nav ul li button {
-    color:#1e293b;
-    text-decoration:none;
-    font-weight:600;
-    background:none;
-    border:none;
-    cursor:pointer;
-    padding:10px 20px; 
-    border-radius:35px;
-    position:relative;
-    overflow:hidden;
-    transition:0.4s;
+    color:#1e293b; text-decoration:none; font-weight:600;
+    background:none; border:none; cursor:pointer;
+    padding:10px 20px; border-radius:35px;
+    position:relative; overflow:hidden; transition:0.3s;
     font-size:1rem; line-height:1.2;
 }
-body.dark-mode nav ul li a,
-body.dark-mode nav ul li button { color:#f1f5f9; }
+body.dark-mode nav ul li a, body.dark-mode nav ul li button { color:#f1f5f9; }
 
-/* Hover Animation */
-nav ul li a::after,
-nav ul li button::after {
-    content:""; position:absolute; left:0; bottom:0;
-    width:100%; height:0; background:rgba(59,130,246,0.2);
-    transition:0.3s; border-radius:35px;
+/* Hover Glow */
+nav ul li a:hover, nav ul li button:hover {
+    color:#6d28d9;
+    box-shadow:0 0 12px rgba(139,92,246,0.4);
+    transform:translateY(-2px);
 }
-nav ul li a:hover::after,
-nav ul li button:hover::after { height:100%; }
-nav ul li a:hover, nav ul li button:hover { color:#1e40af; }
 
-/* Dropdown */
+/* ===== Dropdowns ===== */
 .dropdown { position:relative; }
 .dropdown-content {
     display:none; position:absolute; right:0; top:45px;
@@ -103,21 +104,36 @@ body.dark-mode .dropdown-content { background:#1f2937; }
 body.dark-mode .dropdown-content a, body.dark-mode .dropdown-content form button { color:#f5f5f5; }
 body.dark-mode .dropdown-content a:hover, body.dark-mode .dropdown-content form button:hover { background:#374151; }
 
-/* Badge */
-.notif-badge { position:absolute; top:-5px; right:-8px; background:#ef4444; color:#fff; border-radius:50%; font-size:0.7rem; padding:2px 6px; }
+/* ===== Notification Badge with Pulse ===== */
+.notif-badge {
+    position:absolute; top:-6px; right:-8px;
+    background:#ef4444; color:#fff; border-radius:50%;
+    font-size:0.7rem; padding:2px 6px;
+    animation:pulse 1.8s infinite;
+}
+@keyframes pulse {
+    0% { box-shadow:0 0 0 0 rgba(239,68,68,0.6); }
+    70% { box-shadow:0 0 0 10px rgba(239,68,68,0); }
+    100% { box-shadow:0 0 0 0 rgba(239,68,68,0); }
+}
 
-/* Container & Footer */
+/* ===== Footer ===== */
 .container { width:90%; max-width:1000px; margin:60px auto; display:flex; flex-direction:column; gap:25px; }
-footer { text-align:center; margin:50px 0 20px 0; padding:20px 0; color:#555; font-size:0.9rem; border-top:1px solid #e0e0e0; background:#fff; }
+footer {
+    text-align:center; margin:50px 0 20px 0; padding:20px 0;
+    color:#555; font-size:0.9rem;
+    border-top:1px solid #e0e0e0; background:#fff;
+}
 body.dark-mode footer { background:#111; color:#ccc; }
 
-@media(max-width:768px) {
-    header { flex-direction:column; align-items:flex-start; gap:10px; padding:20px 25px; }
-    nav ul { flex-wrap:wrap; gap:12px; }
-    .container{width:95%; margin:20px auto;}
+@media(max-width:768px){
+    header{flex-direction:column;align-items:flex-start;gap:10px;padding:20px 25px;}
+    nav ul{flex-wrap:wrap;gap:12px;}
+    .container{width:95%;margin:20px auto;}
 }
 </style>
 </head>
+
 <body>
 <header id="main-header">
     <div class="logo">💫 JoyLine</div>
@@ -133,18 +149,25 @@ body.dark-mode footer { background:#111; color:#ccc; }
                         <a href="#" id="toggle-dark-mode">Dark Mode</a>
                         <div style="position:relative;">
                             <a href="#" id="notif-toggle">Notifications</a>
-                            {% if unread_count > 0 %}<span class="notif-badge" id="notif-badge">{{ unread_count }}</span>{% endif %}
+                            {% if unread_count > 0 %}
+                                <span class="notif-badge" id="notif-badge">{{ unread_count }}</span>
+                            {% endif %}
                             <div class="dropdown-content" id="notif-dropdown" style="top:45px; right:0;">
                                 {% if all_notifications %}
                                     {% for notif in all_notifications %}
-                                        <a href="{{ notif.link }}" class="{% if not notif.is_read %}unread{% endif %}">{{ notif.message }}<br><small>{{ notif.created_at|date:"M d, H:i" }}</small></a>
+                                        <a href="{{ notif.link }}" class="{% if not notif.is_read %}unread{% endif %}">
+                                            {{ notif.message }}<br>
+                                            <small>{{ notif.created_at|date:"M d, H:i" }}</small>
+                                        </a>
                                     {% endfor %}
                                 {% else %}
                                     <p style="padding:10px;text-align:center;color:#888;">No notifications yet.</p>
                                 {% endif %}
                             </div>
                         </div>
-                        <form action="{% url 'postbox:logout' %}" method="post">{% csrf_token %}<button type="submit">Logout</button></form>
+                        <form action="{% url 'postbox:logout' %}" method="post">{% csrf_token %}
+                            <button type="submit">Logout</button>
+                        </form>
                     </div>
                 </li>
             {% else %}
@@ -165,39 +188,42 @@ body.dark-mode footer { background:#111; color:#ccc; }
 
 <script>
 document.addEventListener('DOMContentLoaded', function(){
-    // Dark Mode 
-    document.getElementById('toggle-dark-mode')?.addEventListener('click', function(e){
-        e.preventDefault();
-        document.body.classList.toggle('dark-mode');
-    });
-
-    // User Dropdown
     const userMenuBtn = document.getElementById('user-menu-btn');
     const userDropdown = document.getElementById('user-dropdown');
     const notifToggle = document.getElementById('notif-toggle');
     const notifDropdown = document.getElementById('notif-dropdown');
     const notifBadge = document.getElementById('notif-badge');
+    const header = document.getElementById('main-header');
 
-    userMenuBtn?.addEventListener('click', function(e){
+    // Dark mode toggle
+    document.getElementById('toggle-dark-mode')?.addEventListener('click', e => {
+        e.preventDefault();
+        document.body.classList.toggle('dark-mode');
+    });
+
+    // User dropdown toggle
+    userMenuBtn?.addEventListener('click', e => {
         e.preventDefault();
         userDropdown.style.display = (userDropdown.style.display === 'block') ? 'none' : 'block';
     });
-    notifToggle?.addEventListener('click', function(e){
+
+    // Notification dropdown
+    notifToggle?.addEventListener('click', e => {
         e.preventDefault();
         const isVisible = notifDropdown.style.display === 'block';
         notifDropdown.style.display = isVisible ? 'none' : 'block';
-        if(!isVisible && notifBadge) notifBadge.style.display='none';
+        if(!isVisible && notifBadge) notifBadge.style.display = 'none';
     });
 
-    document.addEventListener('click', function(e){
+    // Click outside to close
+    document.addEventListener('click', e => {
         if(!userDropdown.contains(e.target) && !userMenuBtn.contains(e.target)){
             userDropdown.style.display='none';
             notifDropdown.style.display='none';
         }
     });
 
-    // Scroll effect
-    const header = document.getElementById('main-header');
+    // Scroll shrink effect
     window.addEventListener('scroll', function(){
         if(window.scrollY > 50){ header.classList.add('scrolled'); }
         else{ header.classList.remove('scrolled'); }

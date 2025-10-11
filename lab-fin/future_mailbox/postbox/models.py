@@ -29,9 +29,11 @@ class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    hearts = models.PositiveIntegerField(default=0)  # ← أضفت default=0
 
     def __str__(self):
         return f"Comment by {self.user.username} on {self.event.title}"
+
 
 class Message(models.Model):
     subject = models.CharField(max_length=200)
@@ -45,12 +47,10 @@ class Message(models.Model):
     def __str__(self):
         return self.subject
 
-from django.db import models
-from django.contrib.auth.models import User
-from .models import Event, Comment  # استبدل حسب مكان موديلك
 
-from django.db import models
-from django.contrib.auth.models import User
+from .models import Event, Comment  
+
+
 
 class Notification(models.Model):
     recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')

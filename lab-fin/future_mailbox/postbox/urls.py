@@ -12,6 +12,8 @@ urlpatterns = [
   
   path('timeline/', EventListView.as_view(), name='timeline'),
 
+   path('comment/<int:comment_id>/edit/', views.edit_comment, name='edit_comment'),
+    path('comment/<int:comment_id>/delete/', views.delete_comment, name='delete_comment'),
 
     path('event/<int:pk>/', EventDetailView.as_view(), name='event_detail'),
 
@@ -24,7 +26,7 @@ urlpatterns = [
 
 
     path('timeline/react/<int:event_id>/', views.react_event, name='react_event'),
-    path('my-events/', my_events, name='my_events'),
+    path('my-events/', views.my_events, name='my_events'),
     path('messages/compose/', views.compose_message, name='compose_message'),
     # Authentication
     path('signup/', signup_view, name='signup'),

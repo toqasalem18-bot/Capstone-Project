@@ -1,5 +1,6 @@
 from django import forms
 from .models import Event, Comment
+from .models import Message
 
 class EventForm(forms.ModelForm):
     class Meta:
@@ -19,8 +20,6 @@ class CommentForm(forms.ModelForm):
         model = Comment
         fields = ['content']
 
-from django import forms
-from .models import Message
 
 class MessageForm(forms.ModelForm):
     class Meta:
