@@ -8,37 +8,37 @@
     {% csrf_token %}
     {{ form.non_field_errors }}
 
-    <!-- 🔹 عنوان الحدث -->
+  
     <div class="form-group">
       <label for="id_title">Title:</label>
       {{ form.title }}
     </div>
 
-    <!-- 🔹 وصف الحدث -->
+  
     <div class="form-group">
       <label for="id_description">Description:</label>
       {{ form.description }}
     </div>
 
-    <!-- 🔹 تاريخ الحدث -->
+    
     <div class="form-group">
       <label for="id_event_date">Event Date:</label>
       {{ form.event_date }}
     </div>
 
-    <!-- 🔹 نوع الحدث -->
+  
     <div class="form-group">
       <label for="id_event_type">Event Type:</label>
       {{ form.event_type }}
     </div>
 
-    <!-- 🔹 حقل إضافي يظهر فقط عند اختيار Other -->
+    
     <div id="custom-type-field" class="form-group" style="display:none;">
       <label for="custom_event_type">Enter Custom Event Type:</label>
       <input type="text" name="custom_event_type" id="custom_event_type" class="form-control" placeholder="Enter your event type">
     </div>
 
-    <!-- 🔹 الصورة (اختياري) -->
+  
     <div class="form-group">
       <label for="id_image">Upload Image (optional):</label>
       {{ form.image }}
@@ -52,7 +52,7 @@
   </div>
 </section>
 
-<!-- ✨ JavaScript: إظهار حقل "Other" فقط عند الحاجة -->
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const eventTypeSelect = document.getElementById('id_event_type');
@@ -66,10 +66,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // شغل التحقق أول مرة عند تحميل الصفحة
+  
   toggleCustomField();
 
-  // حدث عند تغيير الاختيار
+  
   eventTypeSelect.addEventListener('change', toggleCustomField);
 });
 </script>
