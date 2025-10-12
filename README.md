@@ -41,7 +41,7 @@ Users can look back at their timeline to relive happy moments.
 - Each comment belongs to one user and one event  
 
 ### ERD Diagram (Image placeholder)
-![ERD Diagram](images/erd.png)  
+![ERD Diagram](images/erd.png)
 *Replace with actual ERD image exported from Mermaid Live Editor*
 
 ---
