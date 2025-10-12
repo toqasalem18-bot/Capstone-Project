@@ -3,9 +3,8 @@ from django.contrib.auth import views as auth_views
 from . import views
 from .views import (
     EventListView, EventDetailView, EventCreateView,
-    EventUpdateView, EventDeleteView, signup_view, my_events,UserEventsView,
-) 
-
+    EventUpdateView, EventDeleteView, signup_view, my_events, user_events,
+)
 app_name = 'postbox'
 
 urlpatterns = [
@@ -27,7 +26,7 @@ urlpatterns = [
 
     path('timeline/react/<int:event_id>/', views.react_event, name='react_event'),
     path('my-events/', views.my_events, name='my_events'),
-    path('messages/compose/', views.compose_message, name='compose_message'),
+    
     path('user/<str:username>/events/', views.user_events, name='user_events'),
 
 

@@ -8,32 +8,14 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.urls import reverse_lazy, reverse
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
-from .models import Event, Comment, Message, Notification
-from .forms import EventForm, CommentForm, MessageForm
-from .utils import create_notification
 from django.utils.decorators import method_decorator
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import User
 
+from .models import Event, Comment, Notification
+from .forms import EventForm, CommentForm
+from .utils import create_notification
 
 User = get_user_model()
-
-# ==========================
-# Compose Message
-# ==========================
-@login_required(login_url='/accounts/login/')
-def compose_message(request):
-    if request.method == 'POST':
-        form = MessageForm(request.POST)
-        if form.is_valid():
-            message = form.save(commit=False)
-            message.created_by = request.user
-            message.save()
-            return redirect('postbox:timeline')
-    else:
-        form = MessageForm()
-    events = Event.objects.filter(user=request.user)
-    return render(request, 'postbox/message_form.html', {'form': form, 'events': events})
 
 
 # ==========================
@@ -151,7 +133,7 @@ def delete_comment(request, comment_id):
 
 
 # ==========================
-# Event Create View 
+# Event Create View
 # ==========================
 class EventCreateView(LoginRequiredMixin, CreateView):
     model = Event
@@ -185,11 +167,6 @@ class EventCreateView(LoginRequiredMixin, CreateView):
 
         return super().form_valid(form)
 
-    def form_invalid(self, form):
-        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse({'success': False, 'error': form.errors.as_json()})
-        return super().form_invalid(form)
-
 
 # ==========================
 # Event Update View
@@ -208,7 +185,6 @@ class EventUpdateView(LoginRequiredMixin, UpdateView):
         if not event.user:
             event.user = self.request.user
 
-      
         if self.request.POST.get('remove_image') == '1':
             event.image.delete(save=False)
             event.image = None
@@ -265,22 +241,10 @@ def notifications_view(request):
 
 
 # ==========================
-# User Events 
+# User Events
 # ==========================
 @login_required
 def user_events(request, username):
     user = get_object_or_404(User, username=username)
     events = Event.objects.filter(user=user).order_by('-event_date', '-created_at')
-    return render(request, 'postbox/user_events.html', {'user': user, 'events': events})
-
-
-
-def UserEventsView(request, username):
-    
-    user = get_object_or_404(User, username=username)
-
-    
-    events = Event.objects.filter(user=user).order_by('-id')
-
-    
     return render(request, 'postbox/user_events.html', {'user': user, 'events': events})
