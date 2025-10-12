@@ -3,29 +3,202 @@
 {% block title %}Events of {{ user.username }}{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1 class="my-4">Events of {{ user.username }}</h1>
+<style>
 
-    {% if events %}
-        <ul class="list-group">
-            {% for event in events %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>{{ event.title }}</strong> <br>
-                        <small>{{ event.event_date }}</small> <br>
-                        <span>{{ event.description|truncatewords:20 }}</span>
-                    </div>
-                    <div>
-                        <span class="badge bg-primary">{{ event.hearts }} ❤️</span>
-                        <span class="badge bg-success">{{ event.thumbs }} 👍</span>
-                        <span class="badge bg-warning">{{ event.tada }} 🎉</span>
-                    </div>
-                    <a href="{% url 'postbox:event_detail' event.id %}" class="btn btn-outline-secondary btn-sm ms-3">View</a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No events found for this user.</p>
-    {% endif %}
+.events-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem;
+}
+
+/* ===== Event Card ===== */
+.event-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+
+.event-card[data-type="birthday"] { border-top: 5px solid #443154; } 
+.event-card[data-type="graduation"] { border-top: 5px solid #232025; }
+.event-card[data-type="anniversary"] { border-top: 5px solid #101223; }
+.event-card[data-type="other"] { border-top: 5px solid #6b759f; }
+
+
+.event-content {
+    padding: 1rem 1rem 0.5rem 1rem;
+}
+.event-type-icon {
+    font-size: 1rem;
+    margin-bottom: 0.3rem;
+    display: inline-block;
+    transition: all 0.3s ease;
+    cursor: default;
+    animation: pulse 2s infinite;
+}
+
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+
+.event-type-icon.birthday:hover {
+    text-shadow: 0 0 8px#443154, 0 0 12px #443154;
+}
+.event-type-icon.graduation:hover {
+    text-shadow: 0 0 8px #443154, 0 0 12px #443154;
+}
+.event-type-icon.anniversary:hover {
+    text-shadow: 0 0 8px #443154, 0 0 12px #443154;
+}
+.event-type-icon.other:hover {
+    text-shadow: 0 0 8px #443154, 0 0 12px #443154;
+}
+
+.event-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+}
+.event-date {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+.event-description {
+    font-size: 0.95rem;
+    color: #374151;
+}
+
+/* ===== Event Image ===== */
+.event-image-wrapper img {
+    width: 100%;
+    border-radius: 0 0 16px 16px;
+    object-fit: cover;
+    max-height: 200px;
+}
+
+/* ===== Footer ===== */
+.event-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid #e5e7eb;
+    background-color: #f9fafb;
+    border-radius: 0 0 16px 16px;
+}
+.event-badges .badge {
+    margin-right: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.event-footer a.btn {
+    font-size: 0.8rem;
+    background: linear-gradient(to right, #1e40af, #2563eb);
+    color: #fff;
+    border-radius: 8px;
+    padding: 0.35rem 0.75rem;
+    transition: background 0.3s;
+}
+.event-footer a.btn:hover {
+    background: linear-gradient(to right, #2563eb, #1e3a8a);
+    color: #fff;
+}
+
+
+.event-creator {
+    text-align: right;
+    font-size: 0.75rem;
+    color: #6b7280;
+    padding: 0.5rem 1rem;
+}
+.creator-link {
+    text-decoration: none;
+    color: #2563eb;
+}
+.creator-link:hover {
+    text-decoration: underline;
+}
+
+
+.no-events {
+    text-align: center;
+    font-size: 1rem;
+    color: #6b7280;
+    padding: 2rem;
+}
+</style>
+
+<h1 class="text-center my-4">Events of {{ user.username }}</h1>
+
+{% if events %}
+<div class="events-container">
+    {% for event in events %}
+    <div class="event-card fade-in" data-type="{{ event.event_type }}">
+      
+        <div class="event-content">
+
+          
+            <div class="event-type-icon 
+                {% if event.event_type == 'other' %}other
+                {% elif event.event_type == 'wedding' %}anniversary
+                {% elif event.event_type == 'birthday' %}birthday
+                {% elif event.event_type == 'graduation' %}graduation
+                {% endif %}
+            ">
+                {% if event.event_type == 'other' %}✨ Other
+                {% elif event.event_type == 'wedding' %}💍 Wedding
+                {% elif event.event_type == 'birthday' %}🎂 Birthday
+                {% elif event.event_type == 'graduation' %}🎓 Graduation
+                {% endif %}
+            </div>
+
+            <h5 class="event-title">{{ event.title }}</h5>
+            <p class="event-date">{{ event.event_date|date:"M. d, Y" }}</p>
+            <p class="event-description">{{ event.description|truncatewords:20 }}</p>
+        </div>
+
+        <!-- Event Image -->
+        {% if event.image %}
+        <div class="event-image-wrapper">
+            <img src="{{ event.image.url }}" alt="{{ event.title }}">
+        </div>
+        {% endif %}
+
+        <!-- Footer: Reactions + View -->
+        <div class="event-footer">
+            <div class="event-badges">
+                <span class="badge bg-primary">{{ event.hearts }} ❤️</span>
+                <span class="badge bg-success">{{ event.thumbs }} 👍</span>
+                <span class="badge bg-warning">{{ event.tada }} 🎉</span>
+            </div>
+            <a href="{% url 'postbox:event_detail' event.id %}" class="btn">View</a>
+        </div>
+
+    
+        <div class="event-creator">
+            Created by: 
+            <a href="{% url 'postbox:user_events' event.user.username %}" class="creator-link">
+                {{ event.user.username }}
+            </a>
+        </div>
+    </div>
+    {% endfor %}
 </div>
+{% else %}
+<div class="no-events">
+    No events found for this user.
+</div>
+{% endif %}
 {% endblock %}

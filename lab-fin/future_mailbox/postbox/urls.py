@@ -28,7 +28,8 @@ urlpatterns = [
     path('timeline/react/<int:event_id>/', views.react_event, name='react_event'),
     path('my-events/', views.my_events, name='my_events'),
     path('messages/compose/', views.compose_message, name='compose_message'),
-    path('user/<str:username>/events/', UserEventsView.as_view(), name='user_events'),
+    path('user/<str:username>/events/', views.user_events, name='user_events'),
+
 
     # Authentication
     path('signup/', signup_view, name='signup'),

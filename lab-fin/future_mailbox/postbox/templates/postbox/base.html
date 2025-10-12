@@ -194,19 +194,19 @@ document.addEventListener('DOMContentLoaded', function(){
     const notifBadge = document.getElementById('notif-badge');
     const header = document.getElementById('main-header');
 
-    // Dark mode toggle
+    // Dark mode 
     document.getElementById('toggle-dark-mode')?.addEventListener('click', e => {
         e.preventDefault();
         document.body.classList.toggle('dark-mode');
     });
 
-    // User dropdown toggle
+  
     userMenuBtn?.addEventListener('click', e => {
         e.preventDefault();
         userDropdown.style.display = (userDropdown.style.display === 'block') ? 'none' : 'block';
     });
 
-    // Notification dropdown
+    // Notification 
     notifToggle?.addEventListener('click', e => {
         e.preventDefault();
         const isVisible = notifDropdown.style.display === 'block';
@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', function(){
         }
     });
 
-    // Scroll shrink effect
+    
     window.addEventListener('scroll', function(){
         if(window.scrollY > 50){ header.classList.add('scrolled'); }
         else{ header.classList.remove('scrolled'); }

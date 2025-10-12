@@ -4,10 +4,10 @@
 {% block content %}
 <div class="event-form-container">
     <h2>Edit Event</h2>
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.non_field_errors }}
-        
+
         <div class="form-group">
             {{ form.title.label_tag }}
             {{ form.title }}
@@ -38,7 +38,19 @@
             {{ form.custom_event_type.errors }}
         </div>
 
-        <div class="form-actions">
+        <div class="form-group">
+            <label for="id_image">Event Image:</label>
+            {{ form.image }}
+            {% if form.instance.image %}
+            <div class="current-image-wrapper" style="margin-top:8px;">
+                <img id="current-event-image" src="{{ form.instance.image.url }}" alt="Current Event Image" style="max-width:200px; border-radius:8px; display:block; margin-bottom:8px;">
+                <button type="button" id="remove-image-btn" class="btn btn-clear">Remove Image</button>
+                <input type="hidden" name="remove_image" id="remove_image" value="0">
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="form-actions" style="margin-top:20px;">
             <button type="submit" class="btn btn-update">Update</button>
             <a href="{% url 'postbox:timeline' %}" class="btn btn-cancel">Cancel</a>
         </div>
@@ -46,114 +58,16 @@
 </div>
 
 <style>
-.event-form-container {
-    max-width: 500px;
-    margin: 40px auto;
-    padding: 30px;
-    background: #f1f5f9;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    font-family: "Poppins", sans-serif;
-}
-
-.event-form-container h2 {
-    margin-bottom: 25px;
-    color: #1e293b;
-    text-align: center;
-    font-size: 1.8rem;
-}
-
-.form-group {
-    margin-bottom: 18px;
-    display: flex;
-    flex-direction: column;
-}
-
-.form-group label {
-    margin-bottom: 6px;
-    font-weight: 500;
-    color: #334155;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-    padding: 10px 12px;
-    border-radius: 8px;
-    border: 1px solid #cbd5e1;
-    font-size: 0.95rem;
-    outline: none;
-    transition: all 0.2s ease;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-}
-
-textarea {
-    resize: vertical;
-    min-height: 100px;
-}
-
-.form-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 20px;
-}
-
-.btn {
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 500;
-    text-decoration: none;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: 0.2s;
-    border: none;
-}
-
-.btn-update {
-    background: linear-gradient(90deg, #4e54c8, #8f94fb);
+.btn-clear {
+    background: #f87171;
     color: #fff;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    margin-top: 4px;
+    cursor: pointer;
 }
-.btn-update:hover {
-    opacity: 0.9;
-}
-
-.btn-cancel {
-    background: #e2e8f0;
-    color: #334155;
-    text-align: center;
-}
-.btn-cancel:hover {
-    background: #cbd5e1;
-}
-
-/* ===== Dark Mode ===== */
-body.dark-mode .event-form-container {
-    background: #1e293b;
-    color: #f1f5f9;
-}
-body.dark-mode .form-group label { color: #93c5fd; }
-body.dark-mode .form-group input,
-body.dark-mode .form-group textarea,
-body.dark-mode .form-group select {
-    background: #334155;
-    border: 1px solid #475569;
-    color: #e2e8f0;
-}
-body.dark-mode .form-group input:focus,
-body.dark-mode .form-group textarea:focus,
-body.dark-mode .form-group select:focus {
-    border-color: #60a5fa;
-    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
-}
-body.dark-mode .btn-update { color: #fff; }
-body.dark-mode .btn-cancel { background: #475569; color: #f1f5f9; }
+.btn-clear:hover { opacity: 0.9; }
 </style>
 
 <script>
@@ -161,16 +75,31 @@ document.addEventListener('DOMContentLoaded', function(){
     const select = document.getElementById('event_type_select');
     const customContainer = document.getElementById('custom_event_container');
 
-    function toggleCustomField(){
-        if(select.value === 'other'){
-            customContainer.style.display = 'block';
-        } else {
-            customContainer.style.display = 'none';
+    if(select){
+        function toggleCustomField(){
+            if(select.value === 'other'){
+                customContainer.style.display = 'block';
+            } else {
+                customContainer.style.display = 'none';
+            }
         }
+        select.addEventListener('change', toggleCustomField);
+        toggleCustomField();
     }
 
-    select.addEventListener('change', toggleCustomField);
-    toggleCustomField();  
+    // Remove Image button
+    const removeBtn = document.getElementById('remove-image-btn');
+    const imageInput = document.getElementById('id_image');
+    const currentImage = document.getElementById('current-event-image');
+    const removeInput = document.getElementById('remove_image');
+
+    if(removeBtn){
+        removeBtn.addEventListener('click', function(){
+            if(currentImage) currentImage.style.display = 'none';
+            if(imageInput) imageInput.value = '';
+            if(removeInput) removeInput.value = '1';
+        });
+    }
 });
 </script>
 {% endblock %}

@@ -7,44 +7,45 @@
     {% if event_list %}
     <div class="events-container">
         {% for event in event_list %}
-        <div class="event-card" data-event-id="{{ event.id }}">
-            <div class="event-header">
-                <h2 class="event-title">{{ event.title }}</h2>
-                <span class="event-date">{{ event.event_date|date:"M d, Y" }}</span>
-
-                <!-- Dropdown menu  -->
-                <div class="dropdown">
-                    <button class="dropdown-toggle">⋮</button>
-                    <div class="dropdown-menu">
-                        <a href="{% url 'postbox:event_detail' event.id %}" class="dropdown-item">View</a>
-                        <a href="{% url 'postbox:event_update' event.id %}" class="dropdown-item">Edit</a>
-                        <a href="{% url 'postbox:event_delete' event.id %}" class="dropdown-item delete">Delete</a>
-                    </div>
+        <div class="event-card" data-type="{{ event.event_type }}">
+            
+            <!-- Dropdown menu -->
+            <div class="dropdown">
+                <button class="dropdown-toggle">⋮</button>
+                <div class="dropdown-menu">
+                    <a href="{% url 'postbox:event_detail' event.id %}" class="dropdown-item">View</a>
+                    <a href="{% url 'postbox:event_update' event.id %}" class="dropdown-item">Edit</a>
+                    <a href="{% url 'postbox:event_delete' event.id %}" class="dropdown-item delete">Delete</a>
                 </div>
             </div>
 
-        
-            <p class="event-type">
-    {% if event.event_type == 'other' %}
-        <span class="event-badge other">✨ {{ event.custom_event_type }}</span>
-    {% elif event.event_type == 'wedding' %}
-        <span class="event-badge wedding">💍 Wedding</span>
-    {% elif event.event_type == 'birthday' %}
-        <span class="event-badge birthday">🎂 Birthday</span>
-    {% elif event.event_type == 'graduation' %}
-        <span class="event-badge graduation">🎓 Graduation</span>
-    {% endif %}
-</p>
+            <!-- Event Type -->
+            <div class="event-type-icon">
+                {% if event.event_type == 'other' %}✨ {{ event.custom_event_type }}
+                {% elif event.event_type == 'wedding' %}💍 Wedding
+                {% elif event.event_type == 'birthday' %}🎂 Birthday
+                {% elif event.event_type == 'graduation' %}🎓 Graduation
+                {% endif %}
+            </div>
 
-              
+            <h2 class="event-title">{{ event.title }}</h2>
+            <p class="event-date">{{ event.event_date|date:"M d, Y" }}</p>
 
-            <p class="event-description">{{ event.description|truncatewords:25 }}</p>
+            {% if event.image %}
+            <div class="event-image-wrapper">
+                <img src="{{ event.image.url }}" alt="{{ event.title }}">
+            </div>
+            {% endif %}
 
-            <div class="event-stats">
-                <span>❤️ {{ event.hearts }}</span>
-                <span>👍 {{ event.thumbs }}</span>
-                <span>🎉 {{ event.tada }}</span>
-                <span>💬 {{ event.comments.count }}</span>
+            <p class="event-description">{{ event.description|truncatewords:20 }}</p>
+
+            <div class="event-footer">
+                <div class="event-stats">
+                    <span>❤️ {{ event.hearts }}</span>
+                    <span>👍 {{ event.thumbs }}</span>
+                    <span>🎉 {{ event.tada }}</span>
+                    <span>💬 {{ event.comments.count }}</span>
+                </div>
             </div>
         </div>
         {% endfor %}
@@ -55,116 +56,65 @@
 </section>
 
 <style>
-/* ===== Body & Page ===== */
-.my-events { max-width: 900px; margin: 40px auto; padding: 0 15px; font-family: "Poppins", sans-serif; }
-.page-title { font-size: 2rem; font-weight: 700; margin-bottom: 25px; color: #1e293b; text-align: center; }
+/* ===== Grid Layout ===== */
+.events-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem;
+}
 
-/* ===== Event Cards ===== */
-.events-container { display: grid; grid-template-columns: 1fr; gap: 20px; }
+/* ===== Event Card ===== */
 .event-card {
-    background: #fff;
+    background-color: #fff;
     border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 8px 20px rgba(65, 34, 128, 0.08);
-    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    padding: 1rem;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 .event-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 28px rgba(42, 36, 129, 0.12);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
 }
 
-.event-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-    position: relative;
-}
-.event-title { font-size: 1.3rem; font-weight: 600; color: #45558d; }
-.event-date { font-size: 0.9rem; color: #64748b; }
-
-/* ===== Event Type Badge ===== */
-.event-type { margin-bottom: 10px; }
-.event-badge {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: #fff;
-}
-
-
-.event-badge.wedding { background-color: #4864a0; }      
-.event-badge.birthday { background-color: #4571a5; }     
-.event-badge.graduation { background-color: #33476c; }  
-.event-badge.other { background-color: #94a3b8; }          
-
-/* ===== Dropdown Menu ===== */
-.dropdown {
-    position: relative;
-    display: inline-block;
-}
-.dropdown-toggle {
-    background: transparent;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    color: #64748b;
-    padding: 5px;
-}
-.dropdown-toggle:hover { color: #334155; }
-.dropdown-menu {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 25px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-    min-width: 120px;
-    z-index: 10;
-    overflow: hidden;
-}
-.dropdown-item {
-    display: block;
-    padding: 8px 14px;
-    text-decoration: none;
-    color: #334155;
-    font-size: 0.9rem;
-    transition: background 0.2s, color 0.2s;
-}
+/* ===== Dropdown ===== */
+.dropdown { position: absolute; top: 10px; right: 10px; }
+.dropdown-toggle { background: transparent; border: none; font-size: 20px; cursor: pointer; }
+.dropdown-menu { display: none; position: absolute; right: 0; top: 25px; background: #fff; border-radius: 8px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); min-width: 120px; z-index: 10; overflow: hidden; }
+.dropdown-item { display: block; padding: 8px 14px; text-decoration: none; color: #334155; font-size: 0.9rem; }
 .dropdown-item:hover { background: #f1f5f9; color: #1e293b; }
 .dropdown-item.delete { color: #b91c1c; }
-.dropdown-item.delete:hover { background: #fee2e2; color: #b91c1c; }
+.dropdown-item.delete:hover { background: #fee2e2; }
 
-/* Show menu when active */
+
 .dropdown.active .dropdown-menu { display: block; }
 
-/* ===== Description & Stats ===== */
-.event-description { font-size: 0.95rem; color: #334155; margin-bottom: 15px; line-height: 1.5; }
-.event-stats { display: flex; gap: 15px; font-size: 0.9rem; color: #475569; margin-bottom: 15px; }
+/* ===== Event Content ===== */
+.event-type-icon { font-size: 0.9rem; margin-bottom: 0.5rem; font-weight: 500; }
+.event-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.25rem; }
+.event-date { font-size: 0.85rem; color: #6b7280; margin-bottom: 0.5rem; }
+.event-description { font-size: 0.95rem; color: #374151; margin-bottom: 0.5rem; }
+
+/* ===== Event Image ===== */
+.event-image-wrapper img { width: 100%; border-radius: 12px; object-fit: cover; max-height: 200px; margin-bottom: 0.5rem; }
+
+/* ===== Footer / Stats ===== */
+.event-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+.event-stats span { margin-right: 0.5rem; font-size: 0.85rem; }
 
 /* ===== No Events ===== */
-.no-events { text-align: center; font-size: 1rem; color: #64748b; margin-top: 30px; }
-
-/* ===== Dark Mode ===== */
-body.dark-mode .event-card { background: #1e293b; color: #f1f5f9; }
-body.dark-mode .dropdown-menu { background: #334155; }
-body.dark-mode .dropdown-item { color: #e2e8f0; }
-body.dark-mode .dropdown-item:hover { background: #475569; color: #fff; }
-body.dark-mode .dropdown-item.delete:hover { background: #7f1d1d; color: #fff; }
+.no-events { text-align: center; font-size: 1rem; color: #6b7280; margin-top: 2rem; }
 </style>
 
 <script>
 document.addEventListener('click', function(e) {
-    // Toggle dropdown
     if (e.target.closest('.dropdown-toggle')) {
         const dropdown = e.target.closest('.dropdown');
         dropdown.classList.toggle('active');
     } else {
-
         document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
     }
 });

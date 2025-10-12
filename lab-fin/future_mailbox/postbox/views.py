@@ -8,17 +8,15 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.urls import reverse_lazy, reverse
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
-from django.shortcuts import redirect
 from .models import Event, Comment, Message, Notification
 from .forms import EventForm, CommentForm, MessageForm
 from .utils import create_notification
-from django.http import JsonResponse
-from django.views.generic import DetailView
-from django.shortcuts import get_object_or_404, redirect
-from .forms import CommentForm
-from .utils import create_notification
 from django.utils.decorators import method_decorator
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
+
+
+User = get_user_model()
 
 # ==========================
 # Compose Message
@@ -36,6 +34,7 @@ def compose_message(request):
         form = MessageForm()
     events = Event.objects.filter(user=request.user)
     return render(request, 'postbox/message_form.html', {'form': form, 'events': events})
+
 
 # ==========================
 # React to Event
@@ -58,6 +57,7 @@ def react_event(request, event_id):
     event.save()
     return JsonResponse({'hearts': event.hearts, 'thumbs': event.thumbs, 'tada': event.tada})
 
+
 # ==========================
 # Timeline
 # ==========================
@@ -77,6 +77,7 @@ class EventListView(ListView):
             context['all_notifications'] = []
         return context
 
+
 # ==========================
 # Event Detail + Comments
 # ==========================
@@ -89,7 +90,6 @@ class EventDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = CommentForm()
-      
         context['comments'] = self.object.comments.all().order_by('-created_at')
         return context
 
@@ -102,11 +102,9 @@ class EventDetailView(DetailView):
             comment.event = self.object
             comment.save()
 
-          
             if comment.user != self.object.user:
                 create_notification(comment.user, self.object, 'comment')
 
-          
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                 return JsonResponse({
                     'success': True,
@@ -120,10 +118,11 @@ class EventDetailView(DetailView):
 
         context = self.get_context_data(form=form)
         return self.render_to_response(context)
-    
 
 
-
+# ==========================
+# Edit Comment
+# ==========================
 @login_required
 def edit_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
@@ -139,7 +138,9 @@ def edit_comment(request, comment_id):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
-
+# ==========================
+# Delete Comment
+# ==========================
 @login_required
 def delete_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
@@ -149,8 +150,8 @@ def delete_comment(request, comment_id):
     return JsonResponse({'success': True})
 
 
-
-# Event Create View (with image )
+# ==========================
+# Event Create View 
 # ==========================
 class EventCreateView(LoginRequiredMixin, CreateView):
     model = Event
@@ -162,18 +163,15 @@ class EventCreateView(LoginRequiredMixin, CreateView):
         event = form.save(commit=False)
         event.user = self.request.user
 
-      
         custom_type = self.request.POST.get('custom_event_type')
         if form.cleaned_data.get('event_type') == 'other' and custom_type:
             event.event_type = custom_type
 
-      
         if self.request.FILES.get('image'):
             event.image = self.request.FILES['image']
 
         event.save()
 
-      
         if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({
                 'success': True,
@@ -193,6 +191,9 @@ class EventCreateView(LoginRequiredMixin, CreateView):
         return super().form_invalid(form)
 
 
+# ==========================
+# Event Update View
+# ==========================
 class EventUpdateView(LoginRequiredMixin, UpdateView):
     model = Event
     form_class = EventForm
@@ -204,20 +205,21 @@ class EventUpdateView(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         event = form.save(commit=False)
+        if not event.user:
+            event.user = self.request.user
 
       
-        custom_type = self.request.POST.get('custom_event_type')
-        if form.cleaned_data.get('event_type') == 'other' and custom_type:
-            event.event_type = custom_type
-
-      
-        if self.request.FILES.get('image'):
-            event.image = self.request.FILES['image']
+        if self.request.POST.get('remove_image') == '1':
+            event.image.delete(save=False)
+            event.image = None
 
         event.save()
         return super().form_valid(form)
 
 
+# ==========================
+# Event Delete View
+# ==========================
 class EventDeleteView(LoginRequiredMixin, DeleteView):
     model = Event
     template_name = 'postbox/event_confirm_delete.html'
@@ -225,6 +227,7 @@ class EventDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_queryset(self):
         return Event.objects.filter(user=self.request.user)
+
 
 # ==========================
 # Signup
@@ -242,18 +245,15 @@ def signup_view(request):
             messages.error(request, "Please correct the errors below.")
     return render(request, 'postbox/signup.html', {'form': form})
 
+
 # ==========================
 # My Events
 # ==========================
-from django.shortcuts import render
-from .models import Event
-from django.contrib.auth.decorators import login_required
-
 @login_required
 def my_events(request):
     event_list = Event.objects.filter(user=request.user).order_by('-event_date')
-    
     return render(request, 'postbox/my_events.html', {'event_list': event_list})
+
 
 # ==========================
 # Notifications
@@ -263,24 +263,24 @@ def notifications_view(request):
     notifications = Notification.objects.filter(recipient=request.user).order_by('-created_at')
     return render(request, 'postbox/notifications.html', {'notifications': notifications})
 
-from django.views.generic import ListView
-from .models import Event
-from django.shortcuts import get_object_or_404
-from django.contrib.auth import get_user_model
 
-User = get_user_model()
+# ==========================
+# User Events 
+# ==========================
+@login_required
+def user_events(request, username):
+    user = get_object_or_404(User, username=username)
+    events = Event.objects.filter(user=user).order_by('-event_date', '-created_at')
+    return render(request, 'postbox/user_events.html', {'user': user, 'events': events})
 
-class UserEventsView(ListView):
-    model = Event
-    template_name = 'postbox/user_events.html'
-    context_object_name = 'events'
 
-    def get_queryset(self):
-        username = self.kwargs.get('username')
-        user = get_object_or_404(User, username=username)
-        return Event.objects.filter(created_by=user).order_by('-event_date', '-created_at')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['username'] = self.kwargs.get('username')
-        return context
+def UserEventsView(request, username):
+    
+    user = get_object_or_404(User, username=username)
+
+    
+    events = Event.objects.filter(user=user).order_by('-id')
+
+    
+    return render(request, 'postbox/user_events.html', {'user': user, 'events': events})

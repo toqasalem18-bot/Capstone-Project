@@ -135,7 +135,7 @@ button[type="submit"]:hover {
     background-color: #1e40af;
 }
 
-/* ===== Back ===== */
+
 .back-link {
     display: inline-block;
     margin-top: 15px;
@@ -160,15 +160,17 @@ button[type="submit"]:hover {
     <h2>{{ event.title }}</h2>
     <p><strong>Date:</strong> {{ event.event_date|date:"M. d, Y" }}</p>
     <p>{{ event.description }}</p>
-    <p>Created by: 
-    {% if event.created_by %}
-        <a href="{% url 'postbox:user_events' event.created_by.username %}" class="creator-link">
-            {{ event.created_by.username }}
-        </a>
-    {% else %}
-        Anonymous
-    {% endif %}
+    {% if event.user %}
+  <p>
+    Created by:
+    <a href="{% url 'postbox:user_events' event.user.username %}">{{ event.user.username }}</a>
 </p>
+
+{% else %}
+  <p>Created by: Anonymous</p>
+{% endif %}
+
+
 
 
     <hr>
