@@ -4,7 +4,7 @@ from .models import Event, Comment, Message
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ['title', 'description', 'event_date', 'event_type', 'custom_event_type']
+        fields = ['title', 'description', 'event_date', 'event_type', 'custom_event_type','image']
         widgets = {
             'event_type': forms.Select(attrs={'class': 'form-control', 'id': 'event_type_select'}),
             'custom_event_type': forms.Textarea(attrs={

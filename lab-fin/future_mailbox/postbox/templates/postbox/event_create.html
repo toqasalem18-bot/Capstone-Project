@@ -33,6 +33,13 @@
       {{ form.custom_event_type }}
     </div>
 
+    <!--image uplode-->
+    <div class="form-group">
+      <label for="id_image">Upload Image:</label>
+      <input type="file" name="image" id="id_image" accept="image/*">
+      <img id="image-preview" src="#" alt="Image Preview" style="display:none; margin-top:10px; max-width:100%; border-radius:10px;">
+    </div>
+
     <button type="submit" class="btn btn-primary">Save Event</button>
   </form>
 
@@ -54,11 +61,27 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // أول ما تفتح الصفحة
   toggleCustomField();
-
-  // لما يغير المستخدم الاختيار
   eventTypeSelect.addEventListener('change', toggleCustomField);
+
+  // معاينة الصورة
+  const imageInput = document.getElementById('id_image');
+  const preview = document.getElementById('image-preview');
+
+  imageInput.addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      }
+      reader.readAsDataURL(file);
+    } else {
+      preview.src = '#';
+      preview.style.display = 'none';
+    }
+  });
 });
 </script>
 

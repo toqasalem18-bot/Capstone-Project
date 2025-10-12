@@ -1,0 +1,31 @@
+{% extends 'postbox/base.html' %}
+
+{% block title %}Events of {{ user.username }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">Events of {{ user.username }}</h1>
+
+    {% if events %}
+        <ul class="list-group">
+            {% for event in events %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ event.title }}</strong> <br>
+                        <small>{{ event.event_date }}</small> <br>
+                        <span>{{ event.description|truncatewords:20 }}</span>
+                    </div>
+                    <div>
+                        <span class="badge bg-primary">{{ event.hearts }} ❤️</span>
+                        <span class="badge bg-success">{{ event.thumbs }} 👍</span>
+                        <span class="badge bg-warning">{{ event.tada }} 🎉</span>
+                    </div>
+                    <a href="{% url 'postbox:event_detail' event.id %}" class="btn btn-outline-secondary btn-sm ms-3">View</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No events found for this user.</p>
+    {% endif %}
+</div>
+{% endblock %}

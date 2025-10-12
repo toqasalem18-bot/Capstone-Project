@@ -12,11 +12,14 @@ class Event(models.Model):
         ('other', 'Other')
     ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_events', null=True, blank=True)
+
     title = models.CharField(max_length=255)
     description = models.TextField()
-    event_date = models.DateField()
+    event_date = models.DateField() 
     event_type = models.CharField(max_length=50, choices=EVENT_TYPES, default='other')
     custom_event_type = models.CharField(max_length=100, blank=True, null=True)
+    image = models.ImageField(upload_to='event_images/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     hearts = models.PositiveIntegerField(default=0)
     thumbs = models.PositiveIntegerField(default=0)

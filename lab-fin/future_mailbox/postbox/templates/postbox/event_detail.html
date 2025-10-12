@@ -160,7 +160,17 @@ button[type="submit"]:hover {
     <h2>{{ event.title }}</h2>
     <p><strong>Date:</strong> {{ event.event_date|date:"M. d, Y" }}</p>
     <p>{{ event.description }}</p>
-    <p><em>Created by: {{ event.user.username }}</em></p>
+    <p>Created by: 
+    {% if event.created_by %}
+        <a href="{% url 'postbox:user_events' event.created_by.username %}" class="creator-link">
+            {{ event.created_by.username }}
+        </a>
+    {% else %}
+        Anonymous
+    {% endif %}
+</p>
+
+
     <hr>
 
     <!-- Comments Section -->

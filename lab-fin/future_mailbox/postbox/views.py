@@ -8,10 +8,17 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.urls import reverse_lazy, reverse
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
-
+from django.shortcuts import redirect
 from .models import Event, Comment, Message, Notification
 from .forms import EventForm, CommentForm, MessageForm
 from .utils import create_notification
+from django.http import JsonResponse
+from django.views.generic import DetailView
+from django.shortcuts import get_object_or_404, redirect
+from .forms import CommentForm
+from .utils import create_notification
+from django.utils.decorators import method_decorator
+from django.contrib.auth import get_user_model
 
 # ==========================
 # Compose Message
@@ -73,15 +80,6 @@ class EventListView(ListView):
 # ==========================
 # Event Detail + Comments
 # ==========================
-from django.http import JsonResponse
-from django.views.generic import DetailView
-from django.shortcuts import get_object_or_404, redirect
-from django.http import JsonResponse
-from .models import Event, Comment
-from .forms import CommentForm
-from .utils import create_notification
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
 @method_decorator(login_required, name='dispatch')
 class EventDetailView(DetailView):
     model = Event
@@ -123,8 +121,7 @@ class EventDetailView(DetailView):
         context = self.get_context_data(form=form)
         return self.render_to_response(context)
     
-from django.views.decorators.http import require_POST
-from django.shortcuts import redirect
+
 
 
 @login_required
@@ -152,8 +149,8 @@ def delete_comment(request, comment_id):
     return JsonResponse({'success': True})
 
 
-# ==========================
-# Event CRUD
+
+# Event Create View (with image )
 # ==========================
 class EventCreateView(LoginRequiredMixin, CreateView):
     model = Event
@@ -164,10 +161,19 @@ class EventCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         event = form.save(commit=False)
         event.user = self.request.user
+
+      
         custom_type = self.request.POST.get('custom_event_type')
         if form.cleaned_data.get('event_type') == 'other' and custom_type:
             event.event_type = custom_type
+
+      
+        if self.request.FILES.get('image'):
+            event.image = self.request.FILES['image']
+
         event.save()
+
+      
         if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({
                 'success': True,
@@ -175,14 +181,17 @@ class EventCreateView(LoginRequiredMixin, CreateView):
                 'description': event.description[:100] + '...',
                 'event_date': event.event_date.strftime('%b %d, %Y'),
                 'user': event.user.username,
+                'image_url': event.image.url if event.image else '',
                 'detail_url': reverse('postbox:event_detail', args=[event.id])
             })
+
         return super().form_valid(form)
 
     def form_invalid(self, form):
         if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'success': False, 'error': form.errors.as_json()})
         return super().form_invalid(form)
+
 
 class EventUpdateView(LoginRequiredMixin, UpdateView):
     model = Event
@@ -192,6 +201,22 @@ class EventUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_queryset(self):
         return Event.objects.filter(user=self.request.user)
+
+    def form_valid(self, form):
+        event = form.save(commit=False)
+
+      
+        custom_type = self.request.POST.get('custom_event_type')
+        if form.cleaned_data.get('event_type') == 'other' and custom_type:
+            event.event_type = custom_type
+
+      
+        if self.request.FILES.get('image'):
+            event.image = self.request.FILES['image']
+
+        event.save()
+        return super().form_valid(form)
+
 
 class EventDeleteView(LoginRequiredMixin, DeleteView):
     model = Event
@@ -227,8 +252,8 @@ from django.contrib.auth.decorators import login_required
 @login_required
 def my_events(request):
     event_list = Event.objects.filter(user=request.user).order_by('-event_date')
+    
     return render(request, 'postbox/my_events.html', {'event_list': event_list})
-
 
 # ==========================
 # Notifications
@@ -237,3 +262,25 @@ def my_events(request):
 def notifications_view(request):
     notifications = Notification.objects.filter(recipient=request.user).order_by('-created_at')
     return render(request, 'postbox/notifications.html', {'notifications': notifications})
+
+from django.views.generic import ListView
+from .models import Event
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class UserEventsView(ListView):
+    model = Event
+    template_name = 'postbox/user_events.html'
+    context_object_name = 'events'
+
+    def get_queryset(self):
+        username = self.kwargs.get('username')
+        user = get_object_or_404(User, username=username)
+        return Event.objects.filter(created_by=user).order_by('-event_date', '-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['username'] = self.kwargs.get('username')
+        return context

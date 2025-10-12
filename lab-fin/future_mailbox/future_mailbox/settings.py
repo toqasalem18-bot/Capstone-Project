@@ -131,6 +131,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # بعد تسجيل الخروج، رجوع لصفحة تسجيل الدخول
 LOGIN_REDIRECT_URL = '/timeline/'  # بعد تسجيل الدخول أو التسجيل
 LOGOUT_REDIRECT_URL = '/login/'    # بعد تسجيل الخروج
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 
 
