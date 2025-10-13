@@ -9,8 +9,8 @@ Users can look back at their timeline to relive happy moments.
 
 ## 🛠️ Tech Stack
 - **Backend:** Python 3.13+, Django 5.x  
-- **Database:** SQLite (or PostgreSQL if configured)  
-- **Frontend:** HTML, CSS, Bootstrap 5  
+- **Database:** PostgreSQL  
+- **Frontend:** HTML, CSS, Bootstrap 5 ,js
 - **Authentication:** Django built-in auth system  
 - **Development Tools:** VS Code, Git  
 
