@@ -3,17 +3,26 @@ from django.contrib.auth import views as auth_views
 from . import views
 from .views import (
     EventListView, EventDetailView, EventCreateView,
-    EventUpdateView, EventDeleteView, signup_view, my_events, user_events,
+    EventUpdateView, EventDeleteView, signup_view,
+    my_events, user_events, 
 )
+from .views import FutureEventListView, future_events
+
 app_name = 'postbox'
 
 urlpatterns = [
-  
-  path('timeline/', EventListView.as_view(), name='timeline'),
+    # Timeline (Past & Today)
+    path('timeline/', EventListView.as_view(), name='timeline'),
 
-   path('comment/<int:comment_id>/edit/', views.edit_comment, name='edit_comment'),
+    # Future Events
+    path('future/', FutureEventListView.as_view(), name='future_events_view'),  
+    path('future-events/', future_events, name='future_events_func'),           
+
+    # Comments
+    path('comment/<int:comment_id>/edit/', views.edit_comment, name='edit_comment'),
     path('comment/<int:comment_id>/delete/', views.delete_comment, name='delete_comment'),
 
+    # Event Detail
     path('event/<int:pk>/', EventDetailView.as_view(), name='event_detail'),
 
     # Event CRUD
@@ -21,14 +30,14 @@ urlpatterns = [
     path('event/<int:pk>/update/', EventUpdateView.as_view(), name='event_update'),
     path('event/<int:pk>/delete/', EventDeleteView.as_view(), name='event_delete'),
 
-    # My Events
-
-
+    # Reactions
     path('timeline/react/<int:event_id>/', views.react_event, name='react_event'),
-    path('my-events/', views.my_events, name='my_events'),
-    
-    path('user/<str:username>/events/', views.user_events, name='user_events'),
 
+    # My Events
+    path('my-events/', my_events, name='my_events'),
+
+    # User Events
+    path('user/<str:username>/events/', user_events, name='user_events'),
 
     # Authentication
     path('signup/', signup_view, name='signup'),

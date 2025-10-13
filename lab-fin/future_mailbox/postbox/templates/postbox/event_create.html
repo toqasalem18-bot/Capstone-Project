@@ -1,50 +1,53 @@
 {% extends 'postbox/base.html' %}
 
 {% block content %}
-<section class="event-create container">
-  <h2>🎉 Add New Event</h2>
+<section class="event-create-container">
+  <div class="event-create-card">
+    <h2>🎉 Create a New Event</h2>
+    <p class="subtitle">Add your special moment and share it with others 💫</p>
 
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.non_field_errors }}
+    <form method="post" enctype="multipart/form-data" class="event-form">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
 
-    <div class="form-group">
-      <label for="id_title">Title:</label>
-      {{ form.title }}
-    </div>
+      <div class="form-group">
+        <label for="id_title"><i class="fa-solid fa-heading"></i> Event Title</label>
+        {{ form.title }}
+      </div>
 
-    <div class="form-group">
-      <label for="id_description">Description:</label>
-      {{ form.description }}
-    </div>
+      <div class="form-group">
+        <label for="id_description"><i class="fa-solid fa-align-left"></i> Description</label>
+        {{ form.description }}
+      </div>
 
-    <div class="form-group">
-      <label for="id_event_date">Event Date:</label>
-      {{ form.event_date }}
-    </div>
+      <div class="form-row">
+        <div class="form-group half">
+          <label for="id_event_date"><i class="fa-regular fa-calendar"></i> Event Date</label>
+          {{ form.event_date }}
+        </div>
 
-    <div class="form-group">
-      <label for="id_event_type">Event Type:</label>
-      {{ form.event_type }}
-    </div>
+        <div class="form-group half">
+          <label for="id_event_type"><i class="fa-solid fa-list"></i> Event Type</label>
+          {{ form.event_type }}
+        </div>
+      </div>
 
-    <div id="custom-type-field" class="form-group" style="display:none;">
-      <label for="custom_event_type">Enter Custom Event Type:</label>
-      {{ form.custom_event_type }}
-    </div>
+      <div id="custom-type-field" class="form-group" style="display:none;">
+        <label for="custom_event_type"><i class="fa-solid fa-pen"></i> Custom Event Type</label>
+        {{ form.custom_event_type }}
+      </div>
 
-    <!--image uplode-->
-    <div class="form-group">
-      <label for="id_image">Upload Image:</label>
-      <input type="file" name="image" id="id_image" accept="image/*">
-      <img id="image-preview" src="#" alt="Image Preview" style="display:none; margin-top:10px; max-width:100%; border-radius:10px;">
-    </div>
+      <!-- Image Upload -->
+      <div class="form-group image-upload">
+        <label for="id_image"><i class="fa-regular fa-image"></i> Upload Image</label>
+        <input type="file" name="image" id="id_image" accept="image/*">
+        <img id="image-preview" src="#" alt="Image Preview">
+      </div>
 
-    <button type="submit" class="btn btn-primary">Save Event</button>
-  </form>
+      <button type="submit" class="btn-primary">💾 Save Event</button>
+    </form>
 
-  <div class="links mt-3">
-    <a href="{% url 'postbox:timeline' %}" class="btn btn-secondary">Back to Timeline</a>
+    <a href="{% url 'postbox:timeline' %}" class="btn-secondary">⬅ Back to Timeline</a>
   </div>
 </section>
 
@@ -52,21 +55,21 @@
 document.addEventListener('DOMContentLoaded', function() {
   const eventTypeSelect = document.getElementById('event_type_select');
   const customField = document.getElementById('custom-type-field');
+  const imageInput = document.getElementById('id_image');
+  const preview = document.getElementById('image-preview');
 
   function toggleCustomField() {
-    if (eventTypeSelect.value === 'other') {
+    if (eventTypeSelect && eventTypeSelect.value === 'other') {
       customField.style.display = 'block';
     } else {
       customField.style.display = 'none';
     }
   }
 
-  toggleCustomField();
-  eventTypeSelect.addEventListener('change', toggleCustomField);
-
-  // معاينة الصورة
-  const imageInput = document.getElementById('id_image');
-  const preview = document.getElementById('image-preview');
+  if (eventTypeSelect) {
+    toggleCustomField();
+    eventTypeSelect.addEventListener('change', toggleCustomField);
+  }
 
   imageInput.addEventListener('change', function() {
     const file = this.files[0];
@@ -86,72 +89,153 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
-.event-create {
+
+body {
+  background: linear-gradient(135deg, #c7d2fe, #e0f2fe, #fef3c7);
+  font-family: 'Poppins', sans-serif;
+}
+
+/* ===== Card Container ===== */
+.event-create-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem 1rem;
+  min-height: 100vh;
+}
+
+.event-create-card {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 25px;
+  padding: 3rem;
   max-width: 600px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background: #f0f4f8;
-  border-radius: 16px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-  transition: all 0.3s;
+  width: 100%;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-.event-create h2 {
+
+.event-create-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+}
+
+
+.event-create-card h2 {
   text-align: center;
-  margin-bottom: 2rem;
   color: #1e3a8a;
-  font-size: 2rem;
-}
-.form-group {
-  margin-bottom: 1.5rem;
-}
-label {
-  display: block;
-  font-weight: 600;
+  font-size: 2.2rem;
+  font-weight: 700;
   margin-bottom: 0.5rem;
-  color: #334155;
 }
+
+.subtitle {
+  text-align: center;
+  color: #475569;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* ===== Form  ===== */
+.form-group {
+  margin-bottom: 1.6rem;
+}
+
+label {
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
 input, select, textarea {
   width: 100%;
-  padding: 0.7rem;
-  border-radius: 10px;
+  padding: 0.9rem;
+  border-radius: 14px;
   border: 1px solid #cbd5e1;
+  background: rgba(255,255,255,0.7);
   font-size: 1rem;
-  transition: border 0.3s, box-shadow 0.3s;
+  transition: all 0.3s ease;
 }
+
 input:focus, select:focus, textarea:focus {
   border-color: #2563eb;
-  box-shadow: 0 0 5px rgba(37, 99, 235, 0.3);
+  background: #ffffff;
+  box-shadow: 0 0 8px rgba(37, 99, 235, 0.3);
   outline: none;
+  transform: scale(1.01);
 }
-textarea {
-  resize: vertical;
+
+
+.form-row {
+  display: flex;
+  gap: 1rem;
 }
+
+.form-row .half {
+  flex: 1;
+}
+
+/* ===== Image Upload ===== */
+.image-upload img {
+  display: none;
+  margin-top: 1rem;
+  border-radius: 16px;
+  max-width: 100%;
+  box-shadow: 0 5px 18px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.image-upload img:hover {
+  transform: scale(1.02);
+}
+
+/* ===== Buttons ===== */
 .btn-primary {
-  background-color: #2563eb;
-  color: #fff;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
   width: 100%;
+  padding: 1rem;
   border: none;
-  padding: 0.75rem;
-  border-radius: 10px;
+  border-radius: 14px;
   font-size: 1.1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background 0.3s ease, transform 0.2s;
 }
+
 .btn-primary:hover {
-  background-color: #1e40af;
+  background: linear-gradient(135deg, #1e40af, #1e3a8a);
+  transform: translateY(-2px);
 }
+
 .btn-secondary {
-  background-color: #64748b;
-  color: #fff;
   display: block;
   text-align: center;
-  border-radius: 10px;
-  padding: 0.75rem;
+  margin-top: 1.5rem;
+  padding: 0.9rem;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #64748b, #475569);
+  color: white;
   text-decoration: none;
-  margin-top: 1rem;
+  font-weight: 500;
+  transition: background 0.3s ease, transform 0.2s;
 }
+
 .btn-secondary:hover {
-  background-color: #475569;
+  background: linear-gradient(135deg, #334155, #1e293b);
+  transform: translateY(-2px);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+  .event-create-card {
+    padding: 2rem;
+  }
+  .form-row {
+    flex-direction: column;
+  }
 }
 </style>
 {% endblock %}

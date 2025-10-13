@@ -10,6 +10,7 @@ from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 from .models import Event, Comment, Notification
 from .forms import EventForm, CommentForm
@@ -41,13 +42,17 @@ def react_event(request, event_id):
 
 
 # ==========================
-# Timeline
+# Timeline (Past + Today)
 # ==========================
 class EventListView(ListView):
     model = Event
     template_name = 'postbox/timeline.html'
     context_object_name = 'event_list'
-    ordering = ['-event_date', '-created_at']
+
+    def get_queryset(self):
+        today = timezone.now().date()
+        # الأحداث التي اليوم أو قبل اليوم
+        return Event.objects.filter(event_date__lte=today).order_by('-event_date', '-created_at')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -59,6 +64,25 @@ class EventListView(ListView):
             context['all_notifications'] = []
         return context
 
+
+# ==========================
+# Future Events (> today)
+# ==========================
+class FutureEventListView(ListView):
+    model = Event
+    template_name = 'postbox/future_events.html'
+    context_object_name = 'future_event_list'
+
+    def get_queryset(self):
+        today = timezone.now().date()
+      
+        return Event.objects.filter(event_date__gt=today).order_by('event_date')
+
+@login_required
+def future_events(request):
+    today = timezone.now().date()
+    events = Event.objects.filter(event_date__gt=today).order_by('event_date')
+    return render(request, 'postbox/future_events.html', {'future_event_list': events})
 
 # ==========================
 # Event Detail + Comments
@@ -73,17 +97,22 @@ class EventDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['form'] = CommentForm()
         context['comments'] = self.object.comments.all().order_by('-created_at')
+        
+        context['can_interact'] = self.object.event_date <= timezone.now().date()
         return context
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
+        
+        if self.object.event_date > timezone.now().date():
+            return JsonResponse({'error': 'Cannot interact with future events yet.'}, status=403)
+
         form = CommentForm(request.POST)
         if form.is_valid():
             comment = form.save(commit=False)
             comment.user = request.user
             comment.event = self.object
             comment.save()
-
             if comment.user != self.object.user:
                 create_notification(comment.user, self.object, 'comment')
 
@@ -95,12 +124,10 @@ class EventDetailView(DetailView):
                     'created_at': comment.created_at.strftime('%b %d, %Y %H:%M'),
                     'comment_id': comment.id
                 })
-
             return redirect('postbox:event_detail', pk=self.object.pk)
 
         context = self.get_context_data(form=form)
         return self.render_to_response(context)
-
 
 # ==========================
 # Edit Comment
@@ -133,7 +160,7 @@ def delete_comment(request, comment_id):
 
 
 # ==========================
-# Event Create View
+# Event CRUD (Create, Update, Delete)
 # ==========================
 class EventCreateView(LoginRequiredMixin, CreateView):
     model = Event
@@ -168,9 +195,6 @@ class EventCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-# ==========================
-# Event Update View
-# ==========================
 class EventUpdateView(LoginRequiredMixin, UpdateView):
     model = Event
     form_class = EventForm
@@ -185,7 +209,7 @@ class EventUpdateView(LoginRequiredMixin, UpdateView):
         if not event.user:
             event.user = self.request.user
 
-        if self.request.POST.get('remove_image') == '1':
+        if self.request.POST.get('remove_image') == '1' and event.image:
             event.image.delete(save=False)
             event.image = None
 
@@ -193,9 +217,6 @@ class EventUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
-# ==========================
-# Event Delete View
-# ==========================
 class EventDeleteView(LoginRequiredMixin, DeleteView):
     model = Event
     template_name = 'postbox/event_confirm_delete.html'

@@ -1,0 +1,110 @@
+{% extends 'postbox/base.html' %}
+{% load static %}
+
+{% block content %}
+<h2 class="text-4xl font-extrabold mb-12 text-gray-900 dark:text-gray-100 text-center">Upcoming Events</h2>
+
+{% now "Y-m-d" as today_str %}
+{% if future_event_list %}
+<div class="events-container">
+    {% for event in future_event_list %}
+    <div class="event-card {% if event.image %}has-image{% else %}no-image{% endif %}" data-type="{{ event.event_type }}">
+        
+        {% if user == event.user %}
+        <div class="event-actions">
+            <a href="{% url 'postbox:event_detail' event.id %}" class="action-icon view" data-tooltip="View">🔍</a>
+            <a href="{% url 'postbox:event_update' event.id %}" class="action-icon edit" data-tooltip="Edit">✏️</a>
+            <a href="{% url 'postbox:event_delete' event.id %}" class="action-icon delete" data-tooltip="Delete">🗑️</a>
+        </div>
+        {% endif %}
+
+        <!-- Event Type -->
+        <div class="event-type-icon font-medium mb-2">
+            {% if event.event_type == 'other' %}✨ {{ event.custom_event_type }}
+            {% elif event.event_type == 'anniversary' %}💍 Anniversary
+            {% elif event.event_type == 'birthday' %}🎂 Birthday
+            {% elif event.event_type == 'graduation' %}🎓 Graduation
+            {% endif %}
+        </div>
+
+        <p class="event-date text-sm text-gray-500 dark:text-gray-400 mb-2">{{ event.event_date|date:"M d, Y" }}</p>
+
+        {% if event.event_date|stringformat:"Y-m-d" == today_str %}
+            <p class="text-center font-semibold text-green-600 dark:text-green-400 mb-2">🎉 will open today</p>
+        {% endif %}
+
+        <h3 class="event-title text-lg font-semibold mb-1 text-gray-900 dark:text-gray-100">{{ event.title }}</h3>
+        <p class="event-description text-gray-700 dark:text-gray-300 mb-2">{{ event.description|truncatewords:30 }}</p>
+
+        {% if event.image %}
+        <div class="event-image-wrapper mb-2">
+            <img src="{{ event.image.url }}" alt="{{ event.title }}" class="w-full rounded-lg object-cover max-h-64">
+        </div>
+        {% endif %}
+
+        <!-- Footer / Stats -->
+        <div class="event-footer flex justify-between items-center mt-2">
+            <div class="event-stats text-sm">
+                <span>❤️ {{ event.hearts }}</span>
+                <span>👍 {{ event.thumbs }}</span>
+                <span>🎉 {{ event.tada }}</span>
+                <span>💬 {{ event.comments.count }}</span>
+                {% if event.event_date|stringformat:"Y-m-d" > today_str %}
+                    <span class="text-xs text-gray-400 ml-2">(open today)</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="event-creator text-right text-xs text-gray-500 dark:text-gray-400 mt-1">
+            Created by: 
+            <a href="{% url 'postbox:user_events' event.user.username %}" class="creator-link text-blue-600 dark:text-blue-400 hover:underline">
+                {{ event.user.username }}
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="no-events text-center text-gray-500 dark:text-gray-400 mt-12">No upcoming events.</p>
+{% endif %}
+
+<style>
+.events-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem;
+}
+.event-card {
+    background-color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    padding: 1rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.event-card:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(0,0,0,0.15); }
+body.dark-mode .event-card { background-color: #1e293b; color: #f1f5f9; }
+.event-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 0.5rem; }
+.action-icon { font-size: 1.2rem; text-decoration: none; position: relative; padding: 2px 5px; transition: transform 0.2s; }
+.action-icon:hover { transform: scale(1.2); border-radius: 6px; }
+.action-icon::after { content: attr(data-tooltip); position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%);
+    background-color: #1e293b; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; opacity: 0;
+    white-space: nowrap; pointer-events: none; transition: opacity 0.2s; }
+.action-icon:hover::after { opacity: 1; }
+.action-icon.view:hover { background-color: rgba(59, 130, 246, 0.1); }
+.action-icon.edit:hover { background-color: rgba(16, 185, 129, 0.1); }
+.action-icon.delete:hover { background-color: rgba(220, 38, 38, 0.1); }
+.event-image-wrapper img { width: 100%; border-radius: 12px; object-fit: cover; max-height: 200px; }
+.event-title { font-size: 1.2rem; font-weight: 600; }
+.event-date { font-size: 0.85rem; color: #6b7280; }
+.event-description { font-size: 0.95rem; color: #374151; }
+body.dark-mode .event-title, body.dark-mode .event-description, body.dark-mode .event-type-icon, body.dark-mode .event-date { color: #e2e8f0; }
+.event-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+.event-stats span { margin-right: 0.5rem; font-size: 0.85rem; }
+body.dark-mode .event-footer { background-color: #334155; }
+.no-events { text-align: center; font-size: 1rem; color: #6b7280; margin-top: 2rem; }
+</style>
+{% endblock %}

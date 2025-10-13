@@ -1,8 +1,8 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.utils import timezone  
 
 User = get_user_model()
-
 
 class Event(models.Model):
     EVENT_TYPES = [
@@ -16,7 +16,7 @@ class Event(models.Model):
 
     title = models.CharField(max_length=255)
     description = models.TextField()
-    event_date = models.DateField() 
+    event_date = models.DateField()
     event_type = models.CharField(max_length=50, choices=EVENT_TYPES, default='other')
     custom_event_type = models.CharField(max_length=100, blank=True, null=True)
     image = models.ImageField(upload_to='event_images/', blank=True, null=True)
@@ -27,6 +27,12 @@ class Event(models.Model):
 
     def __str__(self):
         return self.title
+
+  
+    @property
+    def is_future(self):
+        return self.event_date > timezone.now().date()
+
 
 class Comment(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='comments')

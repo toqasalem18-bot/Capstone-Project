@@ -142,6 +142,9 @@ body.dark-mode footer { background:#111; color:#ccc; }
             {% if user.is_authenticated %}
                 <li><a href="{% url 'postbox:event_create' %}">Add Event</a></li>
                 <li><a href="{% url 'postbox:my_events' %}">My Events</a></li>
+                <li><a href="{% url 'postbox:future_events_view' %}"> Future Events</a></li>
+
+
                 <li class="dropdown">
                     <button id="user-menu-btn">⋮</button>
                     <div class="dropdown-content" id="user-dropdown">
