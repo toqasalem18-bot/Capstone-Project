@@ -57,6 +57,7 @@ Users can look back at their timeline to relive happy moments.
 - Users can react to events with hearts, thumbs, or tada  
 - Notifications are created when someone comments or reacts to a user's event  
 
+
 ### ERD Diagram (Image placeholder)
 ![ERD Diagram](images/pic.png)
 
@@ -65,7 +66,30 @@ Users can look back at their timeline to relive happy moments.
 ---
 
 
-## 🧩 User Stories / Features
+## 🧩 User Stories
+
+1. **As a registered user**, I can create, edit, and delete my own events so that I can maintain my personal timeline.  
+2. **As a user**, I can comment on other users’ events to share my thoughts or congratulations.  
+3. **As a user**, I can react to events (hearts, thumbs, tada) to express appreciation.  
+4. **As a user**, I can view all events in a timeline sorted by date to see other users’ moments.  
+5. **As a user**, I can see notifications when someone comments or reacts to my events.  
+6. **As an admin**, I can remove inappropriate comments or events to keep the platform safe.  
+7. **As a user**, I can browse my own events in a “My Events” page for easy access and management.  
+
+---
+
+## 📱 Responsive Design
+
+- The app uses **CSS Grid** and **Bootstrap 5** to ensure responsiveness across devices.  
+- **Desktop:** Events and comments are displayed side by side for a full view.  
+- **Tablet:** Layout adjusts to two stacked sections to maintain readability.  
+- **Mobile:** Single-column layout for easy scrolling and interaction.  
+- Buttons, forms, and images automatically resize to fit different screen widths.  
+- Interactive elements (like comment actions) remain accessible and touch-friendly on all devices.
+
+---
+
+## 🌟 Features
 
 - **User Authentication:** Users can register, log in, and log out.  
 - **Event Management:** Users can create, edit, and delete their own life events.  
@@ -90,22 +114,20 @@ Users can look back at their timeline to relive happy moments.
 
 ## 🔗 External Resources
 - [Django Documentation](https://docs.djangoproject.com/)  
-- [Stack Overflow](https://stackoverflow.com/) for troubleshooting  
+- [Stack Overflow](https://stackoverflow.com/)  
 - [W3Schools HTML/CSS Guides](https://www.w3schools.com/)  
-- [MDN Web Docs](https://developer.mozilla.org/) for JS/CSS references
+- [MDN Web Docs](https://developer.mozilla.org/)  
 
 ---
 
-
 ## 🛠️ Issues and Project Workflow
-
-- Keep issues active until resolved.
-
-- Document the solution in the issue thread before closing.
-
-- Inactive issues for 30+ minutes may be closed automatically.
-
+- Keep issues active until resolved.  
+- Document the solution in the issue thread before closing.  
+- Inactive issues for 30+ minutes may be closed automatically.  
 - Closed issues cannot be reopened; create a new issue if needed.
+
+---
+
 ## ⚙️ Installation Guide
 1. Clone the repo:  
 ```bash
