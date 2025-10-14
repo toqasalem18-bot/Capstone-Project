@@ -135,16 +135,24 @@ class EventDetailView(DetailView):
 @login_required
 def edit_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
+
+    # 🔹 فقط صاحب التعليق يستطيع التعديل
     if comment.user != request.user:
-        return JsonResponse({'error': 'Not allowed'}, status=403)
+        return JsonResponse({'error': 'You are not allowed to edit this comment.'}, status=403)
 
     if request.method == 'POST':
-        content = request.POST.get('content')
+        content = request.POST.get('content', '').strip()
+        if not content:
+            return JsonResponse({'error': 'Comment cannot be empty.'}, status=400)
         comment.content = content
         comment.save()
-        return JsonResponse({'success': True, 'content': comment.content})
+        return JsonResponse({
+            'success': True,
+            'content': comment.content,
+            'comment_id': comment.id
+        })
 
-    return JsonResponse({'error': 'Invalid request'}, status=400)
+    return JsonResponse({'error': 'Invalid request method.'}, status=400)
 
 
 # ==========================
@@ -153,10 +161,17 @@ def edit_comment(request, comment_id):
 @login_required
 def delete_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
+
+    # 🔹 يمكن لصاحب التعليق أو صاحب الحدث فقط الحذف
     if comment.user != request.user and comment.event.user != request.user:
-        return JsonResponse({'error': 'Not allowed'}, status=403)
-    comment.delete()
-    return JsonResponse({'success': True})
+        return JsonResponse({'error': 'You are not allowed to delete this comment.'}, status=403)
+
+    if request.method == 'POST':
+        comment.delete()
+        return JsonResponse({'success': True, 'comment_id': comment_id})
+
+    return JsonResponse({'error': 'Invalid request method.'}, status=400)
+
 
 
 # ==========================

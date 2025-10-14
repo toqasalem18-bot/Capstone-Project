@@ -145,5 +145,29 @@ body.dark-mode .event-title, body.dark-mode .event-description, body.dark-mode .
 body.dark-mode .event-footer { background-color: #334155; border-top-color: #475569; }
 body.dark-mode .event-stats span { color: #e2e8f0; }
 body.dark-mode .action-icon:hover { background-color: rgba(255,255,255,0.1); }
+/* ===== Responsive ===== */
+@media (max-width: 1024px) {
+    .events-container {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        padding: 1.5rem;
+        gap: 1rem;
+    }
+    .event-title { font-size: 1.1rem; }
+    .event-type-icon { font-size: 0.8rem; }
+}
+
+@media (max-width: 768px) {
+    .events-container {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+    .event-card {
+        padding: 0.75rem;
+    }
+    .event-title { font-size: 1rem; }
+    .event-type-icon { font-size: 0.75rem; }
+    .event-actions { top: 5px; right: 5px; gap: 5px; }
+    .event-footer { flex-direction: column; align-items: flex-start; gap: 5px; }
+}
 </style>
 {% endblock %}

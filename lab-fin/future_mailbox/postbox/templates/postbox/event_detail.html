@@ -185,7 +185,7 @@ button[type="submit"]:hover {
 
         {% if event.user %}
             <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
-                {% if event.user.profile.avatar.url %}
+                {% if event.user.profile and event.user.profile.avatar %}
                     <img src="{{ event.user.profile.avatar.url }}" alt="{{ event.user.username }}'s avatar" class="avatar" loading="lazy">
                 {% else %}
                     <div class="avatar">{{ event.user.username|first|upper }}</div>
@@ -220,21 +220,23 @@ button[type="submit"]:hover {
             {% for comment in event.comments.all|dictsortreversed:"created_at" %}
                 <div class="comment fade-in" data-id="{{ comment.id }}">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        {% if comment.user.profile.avatar.url %}
+                        {% if comment.user.profile and comment.user.profile.avatar %}
                             <img src="{{ comment.user.profile.avatar.url }}" alt="{{ comment.user.username }}'s avatar" class="avatar" loading="lazy">
                         {% else %}
                             <div class="avatar">{{ comment.user.username|first|upper }}</div>
                         {% endif %}
                         <strong>{{ comment.user.username }} said:</strong>
                     </div>
-                    <p>{{ comment.content }}</p>
+                    <p class="comment-content">{{ comment.content }}</p>
                     {% if comment.content|length > 200 %}
                         <span class="read-more">Read More</span>
                     {% endif %}
                     <small>{{ comment.created_at|date:"M. d, Y, h:i a" }}</small>
                     <div class="comment-actions">
                         {% if comment.user == user or event.user == user %}
-                            <button class="edit-btn" data-id="{{ comment.id }}">Edit</button>
+                            {% if comment.user == user %}
+                                <button class="edit-btn" data-id="{{ comment.id }}">Edit</button>
+                            {% endif %}
                             <button class="delete-btn" data-id="{{ comment.id }}">Delete</button>
                         {% endif %}
                     </div>
@@ -263,22 +265,290 @@ button[type="submit"]:hover {
 </div>
 
 <script>
-if (can_interact) {
-    const textarea = document.querySelector('#id_content');
-    const counter = document.querySelector('#char-count');
-    textarea?.addEventListener('input', () => {
-        counter.textContent = `${textarea.value.length}/300 characters`;
-    });
+/* === Helpers & config === */
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
 
-    document.querySelectorAll('.read-more').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const p = btn.previousElementSibling;
-            p.classList.toggle('expanded');
-            btn.textContent = p.classList.contains('expanded') ? 'Show Less' : 'Read More';
-        });
+
+const CURRENT_USER_ID = {{ user.id|default:'null' }};
+const EVENT_USER_ID = {% if event.user %}{{ event.user.id }}{% else %}null{% endif %};
+
+{% if can_interact %}
+(function(){
+    const commentsList = document.getElementById('comments-list');
+    const commentForm = document.getElementById('comment-form');
+    const charCounter = document.getElementById('char-count');
+
+    const textarea = document.querySelector('#id_content');
+    textarea?.addEventListener('input', () => {
+        charCounter.textContent = `${textarea.value.length}/300 characters`;
     });
 
   
-}
+    function initReadMore(container=document){
+        container.querySelectorAll('.read-more').forEach(btn => {
+            if (btn.dataset.bound) return; 
+            btn.dataset.bound = '1';
+            btn.addEventListener('click', () => {
+                const p = btn.previousElementSibling;
+                p.classList.toggle('expanded');
+                btn.textContent = p.classList.contains('expanded') ? 'Show Less' : 'Read More';
+            });
+        });
+    }
+    initReadMore();
+
+
+    function buildCommentHTML(data){
+        
+        const wrapper = document.createElement('div');
+        wrapper.className = 'comment fade-in';
+        wrapper.setAttribute('data-id', data.comment_id);
+
+        const metaDiv = document.createElement('div');
+        metaDiv.style = 'display:flex; align-items:center; gap:10px; margin-bottom:5px;';
+
+        const avatarDiv = document.createElement('div');
+        avatarDiv.className = 'avatar';
+        avatarDiv.textContent = data.user.charAt(0).toUpperCase();
+
+        const strong = document.createElement('strong');
+        strong.textContent = `${data.user} said:`;
+
+        metaDiv.appendChild(avatarDiv);
+        metaDiv.appendChild(strong);
+
+        const p = document.createElement('p');
+        p.className = 'comment-content';
+        p.textContent = data.content;
+
+        const small = document.createElement('small');
+        small.textContent = data.created_at;
+
+        const actions = document.createElement('div');
+        actions.className = 'comment-actions';
+
+        if (data.is_owner){
+            const editBtn = document.createElement('button');
+            editBtn.className = 'edit-btn';
+            editBtn.setAttribute('data-id', data.comment_id);
+            editBtn.textContent = 'Edit';
+            actions.appendChild(editBtn);
+        }
+        if (data.is_owner || data.is_event_owner){
+            const delBtn = document.createElement('button');
+            delBtn.className = 'delete-btn';
+            delBtn.setAttribute('data-id', data.comment_id);
+            delBtn.textContent = 'Delete';
+            actions.appendChild(delBtn);
+        }
+
+        wrapper.appendChild(metaDiv);
+        wrapper.appendChild(p);
+        wrapper.appendChild(small);
+        wrapper.appendChild(actions);
+
+        return wrapper;
+    }
+
+    if(commentForm){
+        commentForm.addEventListener('submit', function(e){
+            e.preventDefault();
+            const formData = new FormData(commentForm);
+            fetch(commentForm.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(res => {
+                if(!res.ok) throw res;
+                return res.json();
+            })
+            .then(data => {
+                if(data.success){
+                    const nowStr = data.created_at || new Date().toLocaleString();
+                    const is_owner = true;
+                    const is_event_owner = (CURRENT_USER_ID !== null && EVENT_USER_ID !== null && CURRENT_USER_ID === EVENT_USER_ID);
+                    const commentData = {
+                        comment_id: data.comment_id,
+                        user: data.user,
+                        content: data.content,
+                        created_at: nowStr,
+                        is_owner: is_owner,
+                        is_event_owner: is_event_owner
+                    };
+                    const newCommentElem = buildCommentHTML(commentData);
+                    commentsList.insertBefore(newCommentElem, commentsList.firstChild);
+
+              
+                    initReadMore(newCommentElem);
+
+                
+                    commentForm.reset();
+                    charCounter.textContent = '0/300 characters';
+
+                    
+                    document.dispatchEvent(new CustomEvent('commentAdded', { detail: { eventId: '{{ event.id }}' } }));
+                } else {
+                    alert(data.error || 'Could not add comment.');
+                }
+            })
+            .catch(async err => {
+                try {
+                    const j = await err.json();
+                    alert(j.error || 'Error adding comment');
+                } catch(e){
+                    alert('Error adding comment');
+                }
+            });
+        });
+    }
+
+    
+    commentsList.addEventListener('click', function(e){
+        const target = e.target;
+
+        // Edit 
+        if(target.classList.contains('edit-btn')){
+            const commentId = target.dataset.id;
+            const commentEl = commentsList.querySelector(`.comment[data-id="${commentId}"]`);
+            if(!commentEl) return;
+            const contentP = commentEl.querySelector('.comment-content');
+            const original = contentP.textContent;
+
+            // create edit 
+            const editArea = document.createElement('div');
+            const ta = document.createElement('textarea');
+            ta.value = original;
+            ta.style.width = '100%';
+            ta.rows = 4;
+            editArea.appendChild(ta);
+
+            const saveBtn = document.createElement('button');
+            saveBtn.className = 'save-btn';
+            saveBtn.textContent = 'Save';
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'cancel-btn';
+            cancelBtn.textContent = 'Cancel';
+            const btnRow = document.createElement('div');
+            btnRow.style = 'margin-top:8px;';
+            btnRow.appendChild(saveBtn);
+            btnRow.appendChild(cancelBtn);
+            editArea.appendChild(btnRow);
+
+            
+            contentP.style.display = 'none';
+            const actionsDiv = commentEl.querySelector('.comment-actions');
+            actionsDiv.style.display = 'none';
+            commentEl.insertBefore(editArea, commentEl.querySelector('small'));
+
+            // cancel
+            cancelBtn.addEventListener('click', () => {
+                editArea.remove();
+                contentP.style.display = '';
+                actionsDiv.style.display = '';
+            });
+
+            // save 
+            saveBtn.addEventListener('click', () => {
+                const newContent = ta.value.trim();
+                if(newContent.length === 0){
+                    alert('Comment cannot be empty.');
+                    return;
+                }
+                const url = "{% url 'postbox:edit_comment' 0 %}".replace('0', commentId);
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': csrftoken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: `content=${encodeURIComponent(newContent)}`
+                })
+                .then(res => {
+                    if(!res.ok) throw res;
+                    return res.json();
+                })
+                .then(j => {
+                    if(j.success){
+                        contentP.textContent = j.content;
+                        editArea.remove();
+                        contentP.style.display = '';
+                        actionsDiv.style.display = '';
+                    } else {
+                        alert(j.error || 'Unable to update comment.');
+                    }
+                })
+                .catch(async err => {
+                    try {
+                        const jj = await err.json();
+                        alert(jj.error || 'Error saving comment');
+                    } catch(e){
+                        alert('Error saving comment');
+                    }
+                });
+            });
+        }
+
+    
+        if(target.classList.contains('delete-btn')){
+            const commentId = target.dataset.id;
+            const commentEl = commentsList.querySelector(`.comment[data-id="${commentId}"]`);
+            if(!commentEl) return;
+            if(!confirm('Are you sure you want to delete this comment?')) return;
+
+            const url = "{% url 'postbox:delete_comment' 0 %}".replace('0', commentId);
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: ''
+            })
+            .then(res => {
+                if(!res.ok) throw res;
+                return res.json();
+            })
+            .then(j => {
+                if(j.success){
+                    commentEl.remove();
+                    document.dispatchEvent(new CustomEvent('commentDeleted', { detail: { eventId: '{{ event.id }}' } }));
+                } else {
+                    alert(j.error || 'Unable to delete comment.');
+                }
+            })
+            .catch(async err => {
+                try {
+                    const jj = await err.json();
+                    alert(jj.error || 'Error deleting comment');
+                } catch(e){
+                    alert('Error deleting comment');
+                }
+            });
+        }
+    });
+
+})();
+{% endif %}
 </script>
 {% endblock %}

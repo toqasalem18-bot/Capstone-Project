@@ -89,10 +89,11 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
-
 body {
   background: linear-gradient(135deg, #c7d2fe, #e0f2fe, #fef3c7);
   font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
 /* ===== Card Container ===== */
@@ -121,7 +122,6 @@ body {
   box-shadow: 0 20px 50px rgba(0,0,0,0.15);
 }
 
-
 .event-create-card h2 {
   text-align: center;
   color: #1e3a8a;
@@ -137,7 +137,7 @@ body {
   margin-bottom: 2rem;
 }
 
-/* ===== Form  ===== */
+/* ===== Form ===== */
 .form-group {
   margin-bottom: 1.6rem;
 }
@@ -166,7 +166,6 @@ input:focus, select:focus, textarea:focus {
   outline: none;
   transform: scale(1.01);
 }
-
 
 .form-row {
   display: flex;
@@ -228,14 +227,55 @@ input:focus, select:focus, textarea:focus {
   transform: translateY(-2px);
 }
 
-/* ===== Responsive ===== */
-@media (max-width: 600px) {
+/* ===== Responsive Improvements ===== */
+@media (max-width: 900px) {
   .event-create-card {
-    padding: 2rem;
+    padding: 2.5rem;
+  }
+  .event-create-card h2 {
+    font-size: 1.8rem;
+  }
+  .subtitle {
+    font-size: 0.95rem;
   }
   .form-row {
     flex-direction: column;
   }
 }
+
+@media (max-width: 600px) {
+  .event-create-card {
+    padding: 2rem;
+  }
+  .event-create-card h2 {
+    font-size: 1.6rem;
+  }
+  input, select, textarea {
+    padding: 0.75rem;
+    font-size: 0.95rem;
+  }
+  .btn-primary, .btn-secondary {
+    padding: 0.85rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .event-create-card {
+    padding: 1.5rem;
+    border-radius: 20px;
+  }
+  .event-create-card h2 {
+    font-size: 1.4rem;
+  }
+  .subtitle {
+    font-size: 0.9rem;
+  }
+  .btn-primary, .btn-secondary {
+    font-size: 0.95rem;
+    padding: 0.75rem;
+  }
+}
 </style>
+
 {% endblock %}

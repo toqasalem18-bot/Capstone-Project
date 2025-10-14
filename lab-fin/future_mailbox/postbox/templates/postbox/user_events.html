@@ -28,54 +28,27 @@
     box-shadow: 0 8px 25px rgba(0,0,0,0.12);
 }
 
-
-.event-card.has-image {
-    height: auto; 
-}
-.event-card.no-image {
+.event-card.has-image, .event-card.no-image {
     height: auto; 
 }
 
-
+/* ===== Event Types ===== */
 .event-card[data-type="birthday"] { border-top: 5px solid #443154; } 
 .event-card[data-type="graduation"] { border-top: 5px solid #232025; }
 .event-card[data-type="anniversary"] { border-top: 5px solid #101223; }
 .event-card[data-type="other"] { border-top: 5px solid #6b759f; }
 
-
+/* ===== Event Content ===== */
 .event-content {
     padding: 1rem 1rem 0.5rem 1rem;
 }
+.event-type-icon { font-size: 1rem; margin-bottom: 0.3rem; display: inline-block; cursor: default; animation: pulse 2s infinite; }
+@keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+.event-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.3rem; }
+.event-date { font-size: 0.85rem; color: #6b7280; }
+.event-description { font-size: 0.95rem; color: #374151; }
 
-.event-type-icon {
-    font-size: 1rem;
-    margin-bottom: 0.3rem;
-    display: inline-block;
-    cursor: default;
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.05); opacity: 0.8; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-.event-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 0.3rem;
-}
-.event-date {
-    font-size: 0.85rem;
-    color: #6b7280;
-}
-.event-description {
-    font-size: 0.95rem;
-    color: #374151;
-}
-
-
+/* ===== Event Image ===== */
 .event-image-wrapper img {
     width: 100%;
     border-radius: 0 0 16px 16px;
@@ -84,7 +57,7 @@
     display: block;
 }
 
-
+/* ===== Event Footer ===== */
 .event-footer {
     display: flex;
     justify-content: space-between;
@@ -94,11 +67,7 @@
     background-color: #f9fafb;
     border-radius: 0 0 16px 16px;
 }
-.event-badges .badge {
-    margin-right: 0.5rem;
-    font-size: 0.85rem;
-}
-
+.event-badges .badge { margin-right: 0.5rem; font-size: 0.85rem; }
 .event-footer a.btn {
     font-size: 0.8rem;
     background: linear-gradient(to right, #1e40af, #2563eb);
@@ -107,34 +76,28 @@
     padding: 0.35rem 0.75rem;
     transition: background 0.3s;
 }
-.event-footer a.btn:hover {
-    background: linear-gradient(to right, #2563eb, #1e3a8a);
-    color: #fff;
+.event-footer a.btn:hover { background: linear-gradient(to right, #2563eb, #1e3a8a); color: #fff; }
+
+/* ===== Event Creator ===== */
+.event-creator { text-align: right; font-size: 0.75rem; color: #6b7280; padding: 0.25rem 1rem; }
+.creator-link { text-decoration: none; color: #2563eb; }
+.creator-link:hover { text-decoration: underline; }
+
+/* ===== No Events ===== */
+.no-events { text-align: center; font-size: 1rem; color: #6b7280; padding: 2rem; }
+
+/* ===== Responsive (Media Queries) ===== */
+@media (max-width: 1024px) {
+    .events-container { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); padding: 1.5rem; }
 }
 
-
-.event-creator {
-    text-align: right;
-    font-size: 0.75rem;
-    color: #6b7280;
-    padding: 0.25rem 1rem; 
-}
-.creator-link {
-    text-decoration: none;
-    color: #2563eb;
-}
-.creator-link:hover {
-    text-decoration: underline;
-}
-
-
-.no-events {
-    text-align: center;
-    font-size: 1rem;
-    color: #6b7280;
-    padding: 2rem;
+@media (max-width: 768px) {
+    .events-container { grid-template-columns: 1fr; padding: 1rem; }
+    .event-footer { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+    .event-footer a.btn { width: 100%; text-align: center; }
 }
 </style>
+
 
 <h1 class="text-center my-4">Events of {{ user.username }}</h1>
 

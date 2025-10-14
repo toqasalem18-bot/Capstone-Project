@@ -106,5 +106,27 @@ body.dark-mode .event-title, body.dark-mode .event-description, body.dark-mode .
 .event-stats span { margin-right: 0.5rem; font-size: 0.85rem; }
 body.dark-mode .event-footer { background-color: #334155; }
 .no-events { text-align: center; font-size: 1rem; color: #6b7280; margin-top: 2rem; }
+/* ===== Responsive ===== */
+@media (max-width: 1024px) {
+    .events-container {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        padding: 1.5rem;
+        gap: 1rem;
+    }
+    .event-title { font-size: 1.1rem; }
+    .event-type-icon { font-size: 0.8rem; }
+}
+
+@media (max-width: 768px) {
+    .events-container {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+    .event-card { padding: 0.75rem; }
+    .event-title { font-size: 1rem; }
+    .event-type-icon { font-size: 0.75rem; }
+    .event-actions { top: 5px; right: 5px; gap: 0.25rem; }
+    .event-footer { flex-direction: column; align-items: flex-start; gap: 5px; }
+}
 </style>
 {% endblock %}

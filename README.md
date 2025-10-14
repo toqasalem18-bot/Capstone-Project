@@ -103,12 +103,34 @@ Users can look back at their timeline to relive happy moments.
 ---
 
 ## 🌟 Stretch Goals (Optional)
-- Write and run unit tests (TDD optional)  
+
 - Add image or file uploads for events  
-- Implement advanced queries, filters, or pagination  
+- Implement advanced queries, filters
 - Customize user profiles (profile picture, bio, etc.)  
-- Email notifications when someone comments on an event  
-- Infinite scroll or pagination on the timeline feed
+- notifications when someone comments on an event  
+
+
+## ⚡ Challenges & Solutions
+
+**Dynamic Event-Comment Relationship**  
+- **Challenge:** Linking comments to the correct events dynamically.  
+- **Solution:** Used `related_name='comments'` in Comment model; access via `event.comments.all()` in templates.
+
+**Responsive Timeline Layout**  
+- **Challenge:** Making the timeline view look good on all devices.  
+- **Solution:** Combined CSS Grid, media queries, and Bootstrap 5 for adaptive event cards.
+
+**Real-time Notifications Display**  
+- **Challenge:** Showing unread notifications and marking them read dynamically.  
+- **Solution:** JavaScript toggles visibility and hides unread badge when opened.
+
+**Image Handling for Events**  
+- **Challenge:** Supporting optional image uploads without breaking the layout.  
+- **Solution:** `ImageField` with `blank=True, null=True` plus conditional rendering in templates.
+
+**Dark Mode Toggle**  
+- **Challenge:** Implementing a seamless dark mode for all elements.  
+- **Solution:** Added `dark-mode` class on `<body>` with CSS transitions and a navbar toggle button.
 
 ---
 

@@ -51,9 +51,9 @@
 
             <!-- Future / Today Notice -->
             {% if event.event_date|stringformat:"Y-m-d" > today_str %}
-                <p class="text-center text-gray-500 dark:text-gray-400 font-medium">will open later</p>
+                <p class="text-center text-gray-500 dark:text-gray-400 font-medium">📅 This joyful moment is in the future!</p>
             {% elif event.event_date|stringformat:"Y-m-d" == today_str %}
-                <p class="text-center font-semibold text-green-600 dark:text-green-400"> will open today</p>
+                <p class="text-center font-semibold text-green-600 dark:text-green-400">🌟 Happening today!</p>
             {% endif %}
 
             <div class="event-actions">
@@ -92,7 +92,7 @@ body.dark-mode .event-title { color:#93c5fd; }
 body.dark-mode .event-meta { color:#cbd5e1; }
 .event-description { line-height:1.6; margin-bottom:10px; }
 .event-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 500; color: #fff; margin-bottom: 5px; }
-.event-badge.wedding { background-color: #4864a0; }      
+.event-badge.anniversary { background-color: #4864a0; }      
 .event-badge.birthday { background-color: #4571a5; }     
 .event-badge.graduation { background-color: #33476c; }  
 .event-badge.other { background-color: #94a3b8; }        
@@ -112,6 +112,21 @@ body.dark-mode .event-card-dropdown .dropdown-content { background:#1e293b; }
 body.dark-mode .event-card-dropdown .dropdown-content a { color:#93c5fd; }
 .event-card-dropdown .dropdown-content a:hover { background:#dbeafe; }
 body.dark-mode .event-card-dropdown .dropdown-content a:hover { background:#334155; }
+@media (max-width: 1024px) {
+    .event-card { padding: 20px; }
+    .event-title { font-size: 1.4rem; }
+    .event-avatar { width: 45px; height: 45px; font-size: 1.1rem; }
+}
+
+@media (max-width: 768px) {
+    .event-card { padding: 15px; margin-bottom: 15px; }
+    .event-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .event-title { font-size: 1.2rem; }
+    .event-avatar { width: 40px; height: 40px; font-size: 1rem; }
+    .event-actions { flex-direction: column; align-items: stretch; gap: 5px; }
+    .btn, .btn-comment, .btn-reaction { width: 100%; text-align: center; }
+    .event-card-dropdown .dropdown-content { min-width: 100px; }
+}
 </style>
 
 <script>
@@ -133,19 +148,13 @@ document.addEventListener('DOMContentLoaded', function(){
         });
     });
 
-    
+    // ===== Reactions
     const timeline = document.querySelector('#timeline-events');
     timeline.addEventListener('click', function(e){
         if(e.target.classList.contains('btn-reaction')){
             const btn = e.target;
             const reaction = btn.dataset.reaction;
             const eventCard = btn.closest('.event-card');
-            const eventDate = eventCard.dataset.eventDate;
-            const today = new Date().toISOString().split('T')[0];
-
-          
-            if(eventDate > today) return;
-
             const eventId = eventCard.dataset.eventId;
 
             fetch(`/timeline/react/${eventId}/`, {
@@ -168,6 +177,7 @@ document.addEventListener('DOMContentLoaded', function(){
         }
     });
 
+    // ===== Update comment dynamically =====
     document.addEventListener('commentAdded', function(e){
         const eventId = e.detail.eventId;
         const eventCard = document.querySelector(`.event-card[data-event-id='${eventId}']`);
