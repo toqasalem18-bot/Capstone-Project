@@ -196,27 +196,33 @@ document.addEventListener('DOMContentLoaded', function(){
     const notifDropdown = document.getElementById('notif-dropdown');
     const notifBadge = document.getElementById('notif-badge');
     const header = document.getElementById('main-header');
+    const darkModeToggle = document.getElementById('toggle-dark-mode');
 
-    // Dark mode 
-    document.getElementById('toggle-dark-mode')?.addEventListener('click', e => {
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add('dark-mode');
+    }
+
+    darkModeToggle?.addEventListener('click', e => {
         e.preventDefault();
         document.body.classList.toggle('dark-mode');
+        if (document.body.classList.contains('dark-mode')) {
+            localStorage.setItem('darkMode', 'enabled');
+        } else {
+            localStorage.setItem('darkMode', 'disabled');
+        }
     });
 
-  
     userMenuBtn?.addEventListener('click', e => {
         e.preventDefault();
         userDropdown.style.display = (userDropdown.style.display === 'block') ? 'none' : 'block';
     });
 
-    // Notification 
     notifToggle?.addEventListener('click', e => {
         e.preventDefault();
         const isVisible = notifDropdown.style.display === 'block';
         notifDropdown.style.display = isVisible ? 'none' : 'block';
         if(!isVisible && notifBadge) notifBadge.style.display = 'none';
     });
-
 
     document.addEventListener('click', e => {
         if(!userDropdown.contains(e.target) && !userMenuBtn.contains(e.target)){
@@ -225,12 +231,12 @@ document.addEventListener('DOMContentLoaded', function(){
         }
     });
 
-    
     window.addEventListener('scroll', function(){
         if(window.scrollY > 50){ header.classList.add('scrolled'); }
         else{ header.classList.remove('scrolled'); }
     });
 });
 </script>
+
 </body>
 </html>
