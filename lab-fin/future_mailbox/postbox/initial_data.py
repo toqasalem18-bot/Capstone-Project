@@ -1,5 +1,3 @@
-# postbox/initial_data.py
-
 from django.contrib.auth.models import User
 from postbox.models import Event, Comment, Notification
 from django.utils import timezone
@@ -8,7 +6,7 @@ def load_data():
     # ----- Users -----
     user1, created = User.objects.get_or_create(username="ahmad", email="ahmad@example.com")
     if created:
-        user1.set_password("123456")  # ضع كلمة مرور آمنة حسب الحاجة
+        user1.set_password("123456")  
         user1.save()
 
     user2, created = User.objects.get_or_create(username="sara", email="sara@example.com")
@@ -28,7 +26,7 @@ def load_data():
         title="Ahmad's Birthday",
         description="Celebrating Ahmad's 25th birthday!",
         event_date=timezone.now() + timezone.timedelta(days=5),
-        event_type="Birthday"
+        event_type="birthday"
     )
 
     event2, _ = Event.objects.get_or_create(
@@ -37,7 +35,17 @@ def load_data():
         title="Sara's Graduation",
         description="Sara graduates from university 🎓",
         event_date=timezone.now() + timezone.timedelta(days=10),
-        event_type="Graduation"
+        event_type="graduation"
+    )
+
+    event3, _ = Event.objects.get_or_create(
+        user=user3,
+        created_by=user3,
+        title="Toqa's Surprise Event",
+        description="A special surprise event for Toqa",
+        event_date=timezone.now() + timezone.timedelta(days=3),
+        event_type="other",
+        custom_event_type="Surprise Party"
     )
 
     # ----- Comments -----
@@ -52,6 +60,13 @@ def load_data():
         event=event2,
         user=user1,
         content="Congrats Sara! 🎉",
+        created_at=timezone.now()
+    )
+
+    Comment.objects.get_or_create(
+        event=event3,
+        user=user1,
+        content="Can't wait for this surprise!",
         created_at=timezone.now()
     )
 
@@ -72,4 +87,12 @@ def load_data():
         created_at=timezone.now()
     )
 
-    print("✅ Dummy data added successfully!")
+    Notification.objects.get_or_create(
+        recipient=user3,
+        message="Ahmad commented on your surprise event!",
+        link=f"/events/{event3.id}/",
+        is_read=False,
+        created_at=timezone.now()
+    )
+
+    print("Dummy data added successfully!")

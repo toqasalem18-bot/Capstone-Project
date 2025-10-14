@@ -27,7 +27,12 @@
                         {% endif %}
                     </div>
 
-                    <div class="event-meta">By <strong>{{ event.user.username }}</strong> — {{ event.event_date|date:"M d, Y" }}</div>
+                  <div class="event-meta">
+    By <strong>
+        <a href="{% url 'postbox:user_events' event.user.username %}" class="user-link">{{ event.user.username }}</a>
+    </strong> — {{ event.event_date|date:"M d, Y" }}
+</div>
+
                 </div>
 
                 {% if user == event.user %}

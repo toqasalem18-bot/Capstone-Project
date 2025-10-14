@@ -4,6 +4,32 @@
 
 {% block content %}
 <style>
+  body.dark-mode .event-card { 
+    background-color: #1e293b; 
+    color: #f1f5f9; 
+    border-top-color: #374151; 
+}
+body.dark-mode .event-date,
+body.dark-mode .event-description,
+body.dark-mode .event-badges .badge {
+    color: #e2e8f0;
+}
+body.dark-mode .event-footer { 
+    background-color: #334155; 
+    border-top-color: #475569;
+}
+body.dark-mode .event-footer a.btn { 
+    background: linear-gradient(to right, #2563eb, #1e3a8a); 
+    color: #f1f5f9;
+}
+body.dark-mode .event-footer a.btn:hover { 
+    background: linear-gradient(to right, #1e40af, #1d4ed8); 
+    color: #fff;
+}
+body.dark-mode .event-creator { 
+    color: #cbd5e1; 
+}
+
 /* ===== Container ===== */
 .events-container {
     display: grid;
@@ -132,13 +158,16 @@
         {% endif %}
 
         <div class="event-footer">
-            <div class="event-badges">
-                <span class="badge bg-primary">{{ event.hearts }} ❤️</span>
-                <span class="badge bg-success">{{ event.thumbs }} 👍</span>
-                <span class="badge bg-warning">{{ event.tada }} 🎉</span>
-            </div>
-            <a href="{% url 'postbox:event_detail' event.id %}" class="btn">View</a>
-        </div>
+    <div class="event-badges">
+        <span class="badge bg-primary">{{ event.hearts }} ❤️</span>
+        <span class="badge bg-success">{{ event.thumbs }} 👍</span>
+        <span class="badge bg-warning">{{ event.tada }} 🎉</span>
+        <span class="badge bg-comment">💬 {{ event.comments.count }}</span>
+    </div>
+    <a href="{% url 'postbox:event_detail' event.id %}" class="btn">View</a>
+</div>
+
+          
 
         <div class="event-creator">
             Created by: 
