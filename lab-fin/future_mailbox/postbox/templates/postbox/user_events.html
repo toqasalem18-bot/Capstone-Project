@@ -30,7 +30,7 @@ body.dark-mode .event-creator {
     color: #cbd5e1; 
 }
 
-/* ===== Container ===== */
+/*  Container*/
 .events-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -38,7 +38,7 @@ body.dark-mode .event-creator {
     padding: 2rem;
 }
 
-/* ===== Event Card ===== */
+/* Event Card  */
 .event-card {
     background-color: #ffffff;
     border-radius: 16px;
@@ -58,13 +58,13 @@ body.dark-mode .event-creator {
     height: auto; 
 }
 
-/* ===== Event Types ===== */
+/*  Event Types */
 .event-card[data-type="birthday"] { border-top: 5px solid #443154; } 
 .event-card[data-type="graduation"] { border-top: 5px solid #232025; }
 .event-card[data-type="anniversary"] { border-top: 5px solid #101223; }
 .event-card[data-type="other"] { border-top: 5px solid #6b759f; }
 
-/* ===== Event Content ===== */
+/* Event Content  */
 .event-content {
     padding: 1rem 1rem 0.5rem 1rem;
 }
@@ -74,7 +74,7 @@ body.dark-mode .event-creator {
 .event-date { font-size: 0.85rem; color: #6b7280; }
 .event-description { font-size: 0.95rem; color: #374151; }
 
-/* ===== Event Image ===== */
+
 .event-image-wrapper img {
     width: 100%;
     border-radius: 0 0 16px 16px;
@@ -83,7 +83,7 @@ body.dark-mode .event-creator {
     display: block;
 }
 
-/* ===== Event Footer ===== */
+
 .event-footer {
     display: flex;
     justify-content: space-between;
@@ -104,15 +104,15 @@ body.dark-mode .event-creator {
 }
 .event-footer a.btn:hover { background: linear-gradient(to right, #2563eb, #1e3a8a); color: #fff; }
 
-/* ===== Event Creator ===== */
+
 .event-creator { text-align: right; font-size: 0.75rem; color: #6b7280; padding: 0.25rem 1rem; }
 .creator-link { text-decoration: none; color: #2563eb; }
 .creator-link:hover { text-decoration: underline; }
 
-/* ===== No Events ===== */
+
 .no-events { text-align: center; font-size: 1rem; color: #6b7280; padding: 2rem; }
 
-/* ===== Responsive (Media Queries) ===== */
+/*Responsive  */
 @media (max-width: 1024px) {
     .events-container { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); padding: 1.5rem; }
 }

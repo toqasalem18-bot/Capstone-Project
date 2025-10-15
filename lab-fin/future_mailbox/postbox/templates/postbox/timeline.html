@@ -54,7 +54,7 @@
             </div>
             {% endif %}
 
-            <!-- Future / Today Notice -->
+            <!-- Future  -->
             {% if event.event_date|stringformat:"Y-m-d" > today_str %}
                 <p class="text-center text-gray-500 dark:text-gray-400 font-medium">📅 This joyful moment is in the future!</p>
             {% elif event.event_date|stringformat:"Y-m-d" == today_str %}
@@ -117,6 +117,7 @@ body.dark-mode .event-card-dropdown .dropdown-content { background:#1e293b; }
 body.dark-mode .event-card-dropdown .dropdown-content a { color:#93c5fd; }
 .event-card-dropdown .dropdown-content a:hover { background:#dbeafe; }
 body.dark-mode .event-card-dropdown .dropdown-content a:hover { background:#334155; }
+
 @media (max-width: 1024px) {
     .event-card { padding: 20px; }
     .event-title { font-size: 1.4rem; }
@@ -137,7 +138,7 @@ body.dark-mode .event-card-dropdown .dropdown-content a:hover { background:#3341
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 
-    // ===== Card Dropdown  =====
+    //  Card Dropdown 
     const dropBtns = document.querySelectorAll('.event-card-dropdown .dropbtn');
     dropBtns.forEach(btn => {
         btn.addEventListener('click', function(e){
@@ -182,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function(){
         }
     });
 
-    // ===== Update comment dynamically =====
+    //  Update comment 
     document.addEventListener('commentAdded', function(e){
         const eventId = e.detail.eventId;
         const eventCard = document.querySelector(`.event-card[data-event-id='${eventId}']`);

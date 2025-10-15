@@ -21,7 +21,7 @@
                     </span>
                 </div>
 
-                <!-- Edit/Delete buttons -->
+                <!-- Edit+Delete buttons -->
                 <div>
                     {% if user == comment.user %}
                         <button class="btn-edit-comment" data-id="{{ comment.id }}"
@@ -42,7 +42,7 @@
                 </div>
             </div>
 
-            <!-- Comment content -->
+            <!-- Comment  -->
             <p class="comment-content" style="margin:6px 0; line-height:1.5;">
                 {{ comment.content|linebreaksbr }}
             </p>

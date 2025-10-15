@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone  
 
 User = get_user_model()
-
+#Event
 class Event(models.Model):
     EVENT_TYPES = [
         ('birthday', 'Birthday'),
@@ -33,7 +33,7 @@ class Event(models.Model):
     def is_future(self):
         return self.event_date > timezone.now().date()
 
-
+#Comment
 class Comment(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='comments')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -50,7 +50,7 @@ class Comment(models.Model):
 from .models import Event, Comment  
 
 
-
+#Notification 
 class Notification(models.Model):
     recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
     message = models.TextField()

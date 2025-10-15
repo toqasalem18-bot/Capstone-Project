@@ -11,7 +11,6 @@ from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-
 from .models import Event, Comment, Notification
 from .forms import EventForm, CommentForm
 from .utils import create_notification
@@ -20,7 +19,7 @@ User = get_user_model()
 
 
 # ==========================
-# React to Event
+# React 
 # ==========================
 @require_POST
 def react_event(request, event_id):
@@ -42,7 +41,7 @@ def react_event(request, event_id):
 
 
 # ==========================
-# Timeline (Past + Today)
+# Timeline
 # ==========================
 class EventListView(ListView):
     model = Event
@@ -51,7 +50,7 @@ class EventListView(ListView):
 
     def get_queryset(self):
         today = timezone.now().date()
-        # الأحداث التي اليوم أو قبل اليوم
+        
         return Event.objects.filter(event_date__lte=today).order_by('-event_date', '-created_at')
 
     def get_context_data(self, **kwargs):
@@ -66,7 +65,7 @@ class EventListView(ListView):
 
 
 # ==========================
-# Future Events (> today)
+# Future Events
 # ==========================
 class FutureEventListView(ListView):
     model = Event
@@ -136,7 +135,7 @@ class EventDetailView(DetailView):
 def edit_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
 
-    # 🔹 فقط صاحب التعليق يستطيع التعديل
+  
     if comment.user != request.user:
         return JsonResponse({'error': 'You are not allowed to edit this comment.'}, status=403)
 
@@ -162,7 +161,7 @@ def edit_comment(request, comment_id):
 def delete_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
 
-    # 🔹 يمكن لصاحب التعليق أو صاحب الحدث فقط الحذف
+    
     if comment.user != request.user and comment.event.user != request.user:
         return JsonResponse({'error': 'You are not allowed to delete this comment.'}, status=403)
 
@@ -175,7 +174,7 @@ def delete_comment(request, comment_id):
 
 
 # ==========================
-# Event CRUD (Create, Update, Delete)
+# Event CRUD 
 # ==========================
 class EventCreateView(LoginRequiredMixin, CreateView):
     model = Event

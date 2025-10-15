@@ -3,7 +3,7 @@ from postbox.models import Event, Comment, Notification
 from django.utils import timezone
 
 def load_data():
-    # ----- Users -----
+    # Users 
     user1, created = User.objects.get_or_create(username="ahmad", email="ahmad@example.com")
     if created:
         user1.set_password("123456")  
@@ -19,7 +19,7 @@ def load_data():
         user3.set_password("123456")
         user3.save()
 
-    # ----- Events -----
+    #  Events 
     event1, _ = Event.objects.get_or_create(
         user=user1,
         created_by=user1,
@@ -48,7 +48,7 @@ def load_data():
         custom_event_type="Surprise Party"
     )
 
-    # ----- Comments -----
+    #Comments 
     Comment.objects.get_or_create(
         event=event1,
         user=user2,
@@ -70,7 +70,7 @@ def load_data():
         created_at=timezone.now()
     )
 
-    # ----- Notifications -----
+    #  Notifications
     Notification.objects.get_or_create(
         recipient=user1,
         message="Sara commented on your event!",
@@ -95,4 +95,4 @@ def load_data():
         created_at=timezone.now()
     )
 
-    print("Dummy data added successfully!")
+    print("data added successfully!")

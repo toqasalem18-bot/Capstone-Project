@@ -1,4 +1,3 @@
-# postbox/db_schema.py
 
 EVENT_FIELDS = [
     "user",

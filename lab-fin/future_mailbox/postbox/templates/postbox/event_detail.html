@@ -3,7 +3,7 @@
 
 {% block content %}
 <style>
-/* ===== Body & General ===== */
+/* Body & General  */
 body {
     background-color: #f7f9fb;
     font-family: "Poppins", sans-serif;
@@ -14,7 +14,7 @@ body.dark-mode {
     color: #f1f5f9;
 }
 
-/* ===== Event Detail ===== */
+/*  Detail */
 .event-detail-container {
     display: flex;
     max-width: 900px;
@@ -27,7 +27,7 @@ body.dark-mode {
     }
 }
 
-/* ===== Event Card ===== */
+/*Card  */
 .event-detail {
     flex: 1;
     background: white;
@@ -53,7 +53,7 @@ body.dark-mode .event-detail {
     transform: scale(1.03);
 }
 
-/* ===== Comments Section ===== */
+
 .comments-section {
     flex: 1;
 }
@@ -102,7 +102,7 @@ body.dark-mode .comment:hover {
 .comment-actions .save-btn:hover { color: #1e40af; }
 .comment-actions .cancel-btn:hover { color: #d32f2f; }
 
-/* ===== Add Comment ===== */
+/*  Add Comment  */
 .add-comment h3 {
     font-weight: 600;
     margin-bottom: 10px;
@@ -135,7 +135,7 @@ button[type="submit"]:hover {
     background-color: #1e40af;
 }
 
-/* ===== Avatar  ===== */
+/*  Avatar  */
 .avatar {
     width: 40px;
     height: 40px;
@@ -151,7 +151,7 @@ button[type="submit"]:hover {
     flex-shrink: 0;
 }
 
-/* ===== Animations ===== */
+/*  Animations */
 .comment.fade-in { 
     animation: fadeIn 0.4s ease forwards;
 }
@@ -212,7 +212,7 @@ button[type="submit"]:hover {
 
     </div>
 
-    <!-- Comments Right -->
+    <!-- Comment -->
     {% if can_interact %}
     <div class="comments-section">
         <h3>Comments</h3>
@@ -246,7 +246,7 @@ button[type="submit"]:hover {
             {% endfor %}
         </div>
 
-        <!-- Add Comment Form -->
+        <!-- Add Comment  -->
         {% if user.is_authenticated %}
         <div class="add-comment">
             <h3>Add a Comment</h3>
@@ -265,14 +265,14 @@ button[type="submit"]:hover {
 </div>
 
 <script>
-/* === Helpers & config === */
+
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
         const cookies = document.cookie.split(';');
         for (let i = 0; i < cookies.length; i++) {
             const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
+          
             if (cookie.substring(0, name.length + 1) === (name + '=')) {
                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                 break;
@@ -433,7 +433,7 @@ const EVENT_USER_ID = {% if event.user %}{{ event.user.id }}{% else %}null{% end
             const contentP = commentEl.querySelector('.comment-content');
             const original = contentP.textContent;
 
-            // create edit 
+            //  edit 
             const editArea = document.createElement('div');
             const ta = document.createElement('textarea');
             ta.value = original;

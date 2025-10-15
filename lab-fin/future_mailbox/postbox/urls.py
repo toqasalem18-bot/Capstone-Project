@@ -11,7 +11,7 @@ from .views import FutureEventListView, future_events
 app_name = 'postbox'
 
 urlpatterns = [
-    # Timeline (Past & Today)
+    # Timeline 
     path('timeline/', EventListView.as_view(), name='timeline'),
 
     # Future Events
